@@ -1,4 +1,10 @@
 package daniel.cushypillows.client;
 
-public class CushyPillowsClient {
+import net.fabricmc.api.ClientModInitializer;
+
+public class CushyPillowsClient implements ClientModInitializer {
+    @Override
+    public void onInitializeClient() {
+
+    }
 }
