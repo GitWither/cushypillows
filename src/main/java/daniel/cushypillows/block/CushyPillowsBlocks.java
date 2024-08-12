@@ -25,6 +25,7 @@ public final class CushyPillowsBlocks {
     public static final Block BROWN_PILLOW = registerBlock("brown_pillow", new PillowBlock(DyeColor.BROWN));
     public static final Block GREEN_PILLOW = registerBlock("green_pillow", new PillowBlock(DyeColor.GREEN));
     public static final Block RED_PILLOW = registerBlock("red_pillow", new PillowBlock(DyeColor.RED));
+    public static final Block BLACK_PILLOW = registerBlock("black_pillow", new PillowBlock(DyeColor.BLACK));
 
 
     private static Block registerBlock(String id, Block block) {

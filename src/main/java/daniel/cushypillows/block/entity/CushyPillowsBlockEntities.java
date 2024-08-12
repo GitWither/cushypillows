@@ -27,7 +27,8 @@ public final class CushyPillowsBlockEntities {
             CushyPillowsBlocks.BLUE_PILLOW,
             CushyPillowsBlocks.BROWN_PILLOW,
             CushyPillowsBlocks.GREEN_PILLOW,
-            CushyPillowsBlocks.RED_PILLOW
+            CushyPillowsBlocks.RED_PILLOW,
+            CushyPillowsBlocks.BLACK_PILLOW
     );
 
     private static <T extends BlockEntity> BlockEntityType<T> registerBlockEntity(String id, BlockEntityType.BlockEntityFactory<T> blockEntitySupplier, Block... blocks) {
