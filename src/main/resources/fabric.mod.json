@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "cushypillows",
+  "version": "${version}",
+  "name": "Cushy Pillows",
+  "description": "",
+  "authors": [],
+  "contact": {
+    "repo": "https://github.com/GitWither/cushypillows"
+  },
+  "license": "All-Rights-Reserved",
+  "icon": "assets/cushypillows/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "daniel.cushypillows.client.CushyPillowsClient"
+    ],
+    "main": [
+      "daniel.cushypillows.CushyPillows"
+    ]
+  },
+  "mixins": [
+    "cushypillows.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
