@@ -10,7 +10,7 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
 public final class CushyPillowsBlockEntities {
-    public static final BlockEntityType<PillowBlockEntity> PILLOW_BLOCK_ENTITY_TYPE = registerBlockEntity(
+    public static final BlockEntityType<PillowBlockEntity> PILLOW = registerBlockEntity(
             "pillow_block_entity",
             PillowBlockEntity::new,
             CushyPillowsBlocks.WHITE_PILLOW,
