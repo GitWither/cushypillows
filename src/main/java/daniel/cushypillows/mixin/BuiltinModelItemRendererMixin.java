@@ -1,15 +1,10 @@
 package daniel.cushypillows.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import daniel.cushypillows.block.CushyPillowsBlocks;
 import daniel.cushypillows.block.PillowBlock;
 import daniel.cushypillows.block.entity.PillowBlockEntity;
-import net.minecraft.block.AbstractBannerBlock;
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BannerBlockEntity;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.client.render.item.BuiltinModelItemRenderer;

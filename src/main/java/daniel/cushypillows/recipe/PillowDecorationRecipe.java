@@ -1,6 +1,9 @@
 package daniel.cushypillows.recipe;
 
 import daniel.cushypillows.block.CushyPillowsBlocks;
+import daniel.cushypillows.block.PillowBlock;
+import daniel.cushypillows.block.entity.CushyPillowsBlockEntities;
+import daniel.cushypillows.item.PillowItem;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.BannerItem;
@@ -40,7 +43,7 @@ public class PillowDecorationRecipe extends SpecialCraftingRecipe {
                 continue;
             }
 
-            if (currentItem.isOf(CushyPillowsBlocks.WHITE_PILLOW.asItem())) {
+            if (currentItem.getItem() instanceof PillowItem) {
                 if (!pillowStack.isEmpty()) {
                     return false;
                 }
@@ -63,32 +66,25 @@ public class PillowDecorationRecipe extends SpecialCraftingRecipe {
     @Override
     public ItemStack craft(RecipeInputInventory inventory, DynamicRegistryManager registryManager) {
         ItemStack bannerStack = ItemStack.EMPTY;
-        ItemStack pillowStack = ItemStack.EMPTY;
 
-        for (int i = 0; i < inventory.size(); ++i) {
+        for (int i = 0; i < inventory.size(); i++) {
             ItemStack currentItem = inventory.getStack(i);
 
             if (currentItem.isEmpty()) continue;
 
             if (currentItem.getItem() instanceof BannerItem) {
                 bannerStack = currentItem;
-                continue;
+                break;
             }
-
-            if (!currentItem.isOf(CushyPillowsBlocks.WHITE_PILLOW.asItem())) continue;
-
-            pillowStack = currentItem.copy();
         }
-        if (pillowStack.isEmpty()) {
-            return pillowStack;
-        }
+
 
         BannerItem bannerItem = (BannerItem) bannerStack.getItem();
+        ItemStack pillowStack = new ItemStack(PillowBlock.getForColor(bannerItem.getColor()).asItem());
 
         NbtCompound nbtCompound = BlockItem.getBlockEntityNbt(bannerStack);
         NbtCompound bannerData = nbtCompound == null ? new NbtCompound() : nbtCompound.copy();
-        bannerData.putInt("Base", bannerItem.getColor().getId());
-        BlockItem.setBlockEntityNbt(pillowStack, BlockEntityType.BANNER, bannerData);
+        BlockItem.setBlockEntityNbt(pillowStack, CushyPillowsBlockEntities.PILLOW, bannerData);
 
         return pillowStack;
     }

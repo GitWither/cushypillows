@@ -31,8 +31,6 @@ public final class CushyPillowsBlocks {
     private static Block registerBlock(String id, Block block) {
         Identifier identifier = Identifier.of(CushyPillows.MOD_ID, id);
 
-        Registry.register(Registries.ITEM, identifier, new BlockItem(block, new Item.Settings()));
-
         return Registry.register(Registries.BLOCK, identifier, block);
     }
 
