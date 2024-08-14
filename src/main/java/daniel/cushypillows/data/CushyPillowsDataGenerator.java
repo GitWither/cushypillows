@@ -140,7 +140,6 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
             for (DyeColor color : DyeColor.values()) {
                 Block pillow = PillowBlock.getForColor(color);
                 Item dye = DyeItem.byColor(color);
-                Blocks.WHITE_WOOL.getDefaultMapColor();
                 Block wool = dyeToWool.get(color);
 
                 ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, pillow)
