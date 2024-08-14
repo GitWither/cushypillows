@@ -3,13 +3,19 @@ package daniel.cushypillows.data;
 import daniel.cushypillows.CushyPillows;
 import daniel.cushypillows.block.CushyPillowsBlocks;
 import daniel.cushypillows.block.entity.CushyPillowsBlockEntities;
+import daniel.cushypillows.item.CushyPillowsItems;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.block.Blocks;
 import net.minecraft.data.client.*;
+import net.minecraft.data.server.recipe.RecipeJsonProvider;
+import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
+import net.minecraft.item.Items;
+import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
@@ -17,8 +23,10 @@ import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
     @Override
@@ -27,6 +35,7 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
 
         pack.addProvider(PillowTagProvider::new);
         pack.addProvider(PillowModelProvider::new);
+        pack.addProvider(PillowRecipeProvider::new);
     }
 
     private static class PillowTagProvider extends FabricTagProvider.BlockTagProvider {
@@ -94,6 +103,26 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
         @Override
         public void generateItemModels(ItemModelGenerator itemModelGenerator) {
             Model parent = new Model(Optional.of(new Identifier(CushyPillows.MOD_ID, "item/template_pillow")), Optional.empty());
+        }
+    }
+
+    public static class PillowRecipeProvider extends FabricRecipeProvider {
+        public PillowRecipeProvider(FabricDataOutput output) {
+            super(output);
+        }
+
+        @Override
+        public void generate(Consumer<RecipeJsonProvider> exporter) {
+            ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, CushyPillowsItems.WHITE_PILLOW)
+                    .pattern("WFW")
+                    .pattern(" D ")
+                    .input('F', Items.FEATHER)
+                    .input('D', Items.WHITE_DYE)
+                    .input('W', Items.WHITE_WOOL)
+                    .criterion(hasItem(Items.FEATHER), conditionsFromItem(Items.FEATHER))
+                    .criterion(hasItem(Items.WHITE_DYE), conditionsFromItem(Items.WHITE_DYE))
+                    .criterion(hasItem(Items.WHITE_WOOL), conditionsFromItem(Items.WHITE_WOOL))
+                    .offerTo(exporter, new Identifier(getRecipeName(CushyPillowsItems.WHITE_PILLOW)));
         }
     }
 }

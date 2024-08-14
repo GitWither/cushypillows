@@ -56,11 +56,11 @@ public class PillowBlock extends BlockWithEntity {
     }
 
     private void bounceEntity(Entity entity) {
-        Vec3d vec3d = entity.getVelocity();
+        Vec3d vel = entity.getVelocity();
 
-        if (vec3d.y < 0.0) {
+        if (vel.y < 0.0) {
             double y = entity instanceof LivingEntity ? 1.0 : 0.8;
-            entity.setVelocity(vec3d.x, -vec3d.y * 0.66f * y, vec3d.z);
+            entity.setVelocity(vel.x, -vel.y * 0.66f * y, vel.z);
         }
     }
 
