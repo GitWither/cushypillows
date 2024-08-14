@@ -48,9 +48,9 @@ public class PillowBlockEntityRenderer implements BlockEntityRenderer<PillowBloc
                 .uv(0, 0).cuboid(-1.0F, -25.75F, 1.0F, 18.0F, 0.0F, 14.0F, new Dilation(0.0F)), ModelTransform.of(0.0F, -25.0F, 16.0F, 3.1416F, 0.0F, 0.0F));
 
         ModelPartData pattern = modelPartData.addChild("pattern", ModelPartBuilder.create().uv(1, 8).mirrored().cuboid(2.0F, 4.0F, 15.0F, 12.0F, 8.0F, 0.0F, new Dilation(0.301F)).mirrored(false)
-                .uv(-4, 3).cuboid(2.0F, 4.0F, 15.0F, 12.0F, 0.0F, 5.0F, new Dilation(0.301F)), ModelTransform.of(0.0F, 20.0F, 0.0F, 1.5708F, 0.0F, 0.0F));
+                .uv(-4, 3).mirrored().cuboid(2.0F, 4.0F, 15.0F, 12.0F, 0.0F, 5.0F, new Dilation(0.301F)).mirrored(false), ModelTransform.of(0.0F, 20.0F, 0.0F, 1.5708F, 0.0F, 0.0F));
 
-        ModelPartData cube_r1 = pattern.addChild("cube_r1", ModelPartBuilder.create().uv(-4, 16).cuboid(-6.0F, 0.0F, -2.5F, 12.0F, 0.0F, 5.0F, new Dilation(0.301F)), ModelTransform.of(8.0F, 12.0F, 17.5F, 3.1416F, 0.0F, 0.0F));
+        ModelPartData cube_r1 = pattern.addChild("cube_r1", ModelPartBuilder.create().uv(-4, 16).mirrored().cuboid(-6.0F, 0.0F, -2.5F, 12.0F, 0.0F, 5.0F, new Dilation(0.301F)).mirrored(false), ModelTransform.of(8.0F, 12.0F, 17.5F, 3.1416F, 0.0F, 0.0F));
         return TexturedModelData.of(modelData, 64, 64);
     }
 
