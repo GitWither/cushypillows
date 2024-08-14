@@ -1,0 +1,8 @@
+{
+  "sources": [
+    {
+      "type": "single",
+      "resource": "cushypillows:entity/pillow/pillow"
+    }
+  ]
+}

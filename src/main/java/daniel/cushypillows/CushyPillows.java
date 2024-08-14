@@ -2,15 +2,12 @@ package daniel.cushypillows;
 
 import daniel.cushypillows.block.CushyPillowsBlocks;
 import daniel.cushypillows.block.entity.CushyPillowsBlockEntities;
+import daniel.cushypillows.recipe.CushyPillowsRecipeTypes;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.item.ItemGroups;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Optional;
 
 public class CushyPillows implements ModInitializer {
     public static final String MOD_ID = "cushypillows";
@@ -21,6 +18,7 @@ public class CushyPillows implements ModInitializer {
     public void onInitialize() {
         LOGGER.debug("Cushy Pillows initialized!");
 
+        CushyPillowsRecipeTypes.initialize();
         CushyPillowsBlocks.initialize();
         CushyPillowsBlockEntities.initialize();
 
