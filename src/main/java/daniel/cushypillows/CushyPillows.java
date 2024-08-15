@@ -21,8 +21,6 @@ public class CushyPillows implements ModInitializer {
     public static final String MOD_ID = "cushypillows";
     public static final Logger LOGGER = LoggerFactory.getLogger(CushyPillows.class);
 
-    public static final DefaultParticleType FEATHERS = FabricParticleTypes.simple();
-
 
     @Override
     public void onInitialize() {

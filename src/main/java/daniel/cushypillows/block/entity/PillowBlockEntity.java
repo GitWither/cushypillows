@@ -3,10 +3,12 @@ package daniel.cushypillows.block.entity;
 import com.mojang.datafixers.util.Pair;
 import daniel.cushypillows.block.PillowBlock;
 import net.minecraft.block.AbstractBannerBlock;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BannerBlockEntity;
 import net.minecraft.block.entity.BannerPattern;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.DecoratedPotBlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -24,10 +26,15 @@ public class PillowBlockEntity extends BlockEntity {
     private DyeColor baseColor;
     private NbtList patternListNbt;
     private List<Pair<RegistryEntry<BannerPattern>, DyeColor>> patterns;
+    private long lastSquishTime;
 
     public PillowBlockEntity(BlockPos pos, BlockState state) {
         super(CushyPillowsBlockEntities.PILLOW, pos, state);
         this.baseColor = ((PillowBlock)state.getBlock()).getColor();
+    }
+
+    public long getLastSquishTime() {
+        return lastSquishTime;
     }
 
     public List<Pair<RegistryEntry<BannerPattern>, DyeColor>> getPatterns() {
@@ -48,6 +55,17 @@ public class PillowBlockEntity extends BlockEntity {
     }
 
     @Override
+    public boolean onSyncedBlockEvent(int type, int data) {
+        if (this.world != null && type == Block.NOTIFY_NEIGHBORS) {
+            this.lastSquishTime = this.world.getTime();
+            return true;
+        } else {
+            return super.onSyncedBlockEvent(type, data);
+        }
+    }
+
+
+    @Override
     protected void writeNbt(NbtCompound nbt) {
         super.writeNbt(nbt);
         if (this.patternListNbt != null) {
@@ -65,5 +83,11 @@ public class PillowBlockEntity extends BlockEntity {
     @Override
     public NbtCompound toInitialChunkDataNbt() {
         return this.createNbt();
+    }
+
+    public void squish() {
+        if (this.world != null && !this.world.isClient()) {
+            this.world.addSyncedBlockEvent(this.getPos(), this.getCachedState().getBlock(), Block.NOTIFY_NEIGHBORS, 0);
+        }
     }
 }

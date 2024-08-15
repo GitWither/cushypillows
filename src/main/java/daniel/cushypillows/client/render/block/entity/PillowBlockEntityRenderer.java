@@ -20,6 +20,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.RotationPropertyHelper;
 
@@ -64,6 +65,17 @@ public class PillowBlockEntityRenderer implements BlockEntityRenderer<PillowBloc
         matrices.translate(0.5, 0.0, 0.5);
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(degrees));
         matrices.translate(-0.5, 0.0, -0.5);
+
+        if (cachedPillowState.get(PillowBlock.ATTACHED)) {
+            matrices.translate(0, -0.45, 0);
+        }
+
+        if (pillow.getWorld() != null) {
+            float time = ((float)(pillow.getWorld().getTime() - pillow.getLastSquishTime()) + tickDelta) / 5;
+            if (Math.abs(time) <= 1.0f) {
+                matrices.scale(1, MathHelper.cos(time * MathHelper.TAU) * 0.4f + 0.6f, 1);
+            }
+        }
 
         List<Pair<RegistryEntry<BannerPattern>, DyeColor>> patterns = pillow.getPatterns();
 
