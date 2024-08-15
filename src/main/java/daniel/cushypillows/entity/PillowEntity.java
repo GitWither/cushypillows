@@ -51,13 +51,12 @@ public class PillowEntity extends ThrownItemEntity {
 
 	@Override
 	protected void onCollision(HitResult hitResult) {
-		// Gets the projectile ItemStack
+		// getItem in L1 -> gets ItemStack of projectile
+		// getItem in L2 -> gets method of item of ItemStack
+
 		ItemStack projectileItem = this.getItem();
 
-		// Drops the item of the ItemStack in the world where the entity hits
 		this.dropItem(projectileItem.getItem());
-
-		// Discards after hitting something
 		this.discard();
 
 		super.onCollision(hitResult);
