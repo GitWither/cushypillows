@@ -6,6 +6,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -50,7 +51,15 @@ public class PillowEntity extends ThrownItemEntity {
 
 	@Override
 	protected void onCollision(HitResult hitResult) {
-		super.onCollision(hitResult);
+		// Gets the projectile ItemStack
+		ItemStack projectileItem = this.getItem();
+
+		// Drops the item of the ItemStack in the world where the entity hits
+		this.dropItem(projectileItem.getItem());
+
+		// Discards after hitting something
 		this.discard();
+
+		super.onCollision(hitResult);
 	}
 }
