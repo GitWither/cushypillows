@@ -2,6 +2,7 @@ package daniel.cushypillows;
 
 import daniel.cushypillows.block.CushyPillowsBlocks;
 import daniel.cushypillows.block.entity.CushyPillowsBlockEntities;
+import daniel.cushypillows.entity.CushyPillowsEntities;
 import daniel.cushypillows.item.CushyPillowsItems;
 import daniel.cushypillows.particle.CushyPillowsParticleTypes;
 import daniel.cushypillows.recipe.CushyPillowsRecipeTypes;
@@ -32,6 +33,7 @@ public class CushyPillows implements ModInitializer {
         CushyPillowsBlocks.initialize();
         CushyPillowsItems.initialize();
         CushyPillowsBlockEntities.initialize();
+        CushyPillowsEntities.initialize();
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COLORED_BLOCKS).register(entries -> {
             entries.add(CushyPillowsItems.WHITE_PILLOW);
