@@ -2,12 +2,13 @@ package daniel.cushypillows.block.entity;
 
 import com.mojang.datafixers.util.Pair;
 import daniel.cushypillows.block.PillowBlock;
-import net.fabricmc.fabric.impl.transfer.transaction.TransactionManagerImpl;
+import daniel.cushypillows.util.PatternEntry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BannerBlockEntity;
 import net.minecraft.block.entity.BannerPattern;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -15,15 +16,19 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.BlockPos;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static net.minecraft.block.entity.BannerBlockEntity.PATTERNS_KEY;
-
 public class PillowBlockEntity extends BlockEntity {
+    private static final String PATTERNS_KEY = "Patterns";
+    private static final String PATTERN_KEY = "Pattern";
+    private static final String COLOR_KEY = "Color";
+
     private DyeColor baseColor;
     private NbtList patternListNbt;
-    private List<Pair<RegistryEntry<BannerPattern>, DyeColor>> patterns;
+    private List<PatternEntry> patterns;
     private long lastSquishTime;
 
     public PillowBlockEntity(BlockPos pos, BlockState state) {
@@ -35,11 +40,15 @@ public class PillowBlockEntity extends BlockEntity {
         return lastSquishTime;
     }
 
-    public List<Pair<RegistryEntry<BannerPattern>, DyeColor>> getPatterns() {
+    public List<PatternEntry> getPatterns() {
         if (this.patterns == null) {
-            this.patterns = BannerBlockEntity.getPatternsFromNbt(this.baseColor, this.patternListNbt);
+            this.patterns = getPatternsFromNbt(this.patternListNbt);
         }
         return this.patterns;
+    }
+
+    public DyeColor getBaseColor() {
+        return this.baseColor;
     }
 
     public void readFrom(ItemStack stack, DyeColor baseColor) {
@@ -86,5 +95,22 @@ public class PillowBlockEntity extends BlockEntity {
         if (this.world != null && !this.world.isClient()) {
             this.world.addSyncedBlockEvent(this.getPos(), this.getCachedState().getBlock(), Block.NOTIFY_NEIGHBORS, 0);
         }
+    }
+
+    private static List<PatternEntry> getPatternsFromNbt(@Nullable NbtList patternListNbt) {
+        ArrayList<PatternEntry> result = new ArrayList<>();
+
+        if (patternListNbt == null) return result;
+
+        for (int i = 0; i < patternListNbt.size(); ++i) {
+            NbtCompound nbtCompound = patternListNbt.getCompound(i);
+            RegistryEntry<BannerPattern> bannerPatternEntry = BannerPattern.byId(nbtCompound.getString(PATTERN_KEY));
+            if (bannerPatternEntry == null) continue;
+
+            int colorId = nbtCompound.getInt(COLOR_KEY);
+            result.add(new PatternEntry(bannerPatternEntry, DyeColor.byId(colorId)));
+        }
+
+        return result;
     }
 }

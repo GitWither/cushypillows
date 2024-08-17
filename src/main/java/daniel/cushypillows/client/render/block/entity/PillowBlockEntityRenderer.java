@@ -5,6 +5,7 @@ import daniel.cushypillows.CushyPillows;
 import daniel.cushypillows.block.PillowBlock;
 import daniel.cushypillows.block.entity.PillowBlockEntity;
 import daniel.cushypillows.client.CushyPillowsEntityModelLayers;
+import daniel.cushypillows.util.PatternEntry;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BannerPattern;
 import net.minecraft.client.model.*;
@@ -81,11 +82,11 @@ public class PillowBlockEntityRenderer implements BlockEntityRenderer<PillowBloc
             }
         }
 
-        List<Pair<RegistryEntry<BannerPattern>, DyeColor>> patterns = pillow.getPatterns();
+        List<PatternEntry> patterns = pillow.getPatterns();
 
         VertexConsumer mainBodyConsumer = PILLOW_BODY.getVertexConsumer(vertexConsumers, RenderLayer::getEntityCutout);
 
-        float[] baseColor = patterns.get(0).getSecond().getColorComponents();
+        float[] baseColor = pillow.getBaseColor().getColorComponents();
         this.main.render(matrices, mainBodyConsumer, light, overlay, baseColor[0], baseColor[1], baseColor[2], 1.0f);
 
         renderPatterns(matrices, vertexConsumers, light, overlay, this.pattern, patterns);
@@ -93,13 +94,13 @@ public class PillowBlockEntityRenderer implements BlockEntityRenderer<PillowBloc
         matrices.pop();
     }
 
-    private static void renderPatterns(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, ModelPart canvas, List<Pair<RegistryEntry<BannerPattern>, DyeColor>> patterns) {
-        for (int i = 1; i < 17 && i < patterns.size(); i++) {
-            Pair<RegistryEntry<BannerPattern>, DyeColor> pair = patterns.get(i);
+    private static void renderPatterns(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, ModelPart canvas, List<PatternEntry> patterns) {
+        for (int i = 0; i < 17 && i < patterns.size(); i++) {
+            PatternEntry entry = patterns.get(i);
 
-            float[] color = pair.getSecond().getColorComponents();
+            float[] color = entry.color().getColorComponents();
 
-            RegistryEntry<BannerPattern> bannerPatternEntry = pair.getFirst();
+            RegistryEntry<BannerPattern> bannerPatternEntry = entry.pattern();
             if (bannerPatternEntry.getKey().isEmpty()) continue;
 
             SpriteIdentifier patternSprite = TexturedRenderLayers.getShieldPatternTextureId(bannerPatternEntry.getKey().get());
