@@ -43,6 +43,8 @@ import java.util.EnumMap;
 import java.util.Map;
 
 public class PillowBlock extends BlockWithEntity {
+    private static final float BOUNCE_MODIFIER = 0.66f;
+
     private static final Map<DyeColor, Block> COLORED_PILLOWS = new EnumMap<>(DyeColor.class);
 
     public static final IntProperty ROTATION = Properties.ROTATION;
@@ -73,12 +75,24 @@ public class PillowBlock extends BlockWithEntity {
         COLORED_PILLOWS.put(color, this);
     }
 
+    @Override
     public void onEntityLand(BlockView world, Entity entity) {
         if (entity.bypassesLandingEffects()) {
             super.onEntityLand(world, entity);
-        } else {
-            this.bounceEntity(entity);
+            return;
         }
+
+        this.bounceEntity(entity);
+    }
+
+    @Override
+    public void onLandedUpon(World world, BlockState state, BlockPos pos, Entity entity, float fallDistance) {
+        super.onLandedUpon(world, state, pos, entity, fallDistance);
+
+        if (fallDistance < 1.0f) return;
+
+        BlockEntity blockEntity = world.getBlockEntity(pos);
+        this.squish(world, blockEntity, pos);
     }
 
     private void bounceEntity(Entity entity) {
@@ -86,7 +100,7 @@ public class PillowBlock extends BlockWithEntity {
 
         if (vel.y < 0.0) {
             double y = entity instanceof LivingEntity ? 1.0 : 0.8;
-            entity.setVelocity(vel.x, -vel.y * 0.66f * y, vel.z);
+            entity.setVelocity(vel.x, -vel.y * BOUNCE_MODIFIER * y, vel.z);
         }
     }
 
@@ -94,23 +108,11 @@ public class PillowBlock extends BlockWithEntity {
         return color;
     }
 
-    @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (hand == Hand.MAIN_HAND && player.isSneaking() && player.getStackInHand(hand).isEmpty()) {
-            world.setBlockState(pos, state.with(TRIMMED, !state.get(TRIMMED)));
-
-            return ActionResult.SUCCESS;
-        }
-
-        BlockEntity blockEntity = world.getBlockEntity(pos);
-
-        if (!(blockEntity instanceof PillowBlockEntity pillowBlockEntity)) {
-            return ActionResult.PASS;
-        }
+    private void squish(World world, BlockEntity blockEntity, BlockPos pos) {
+        if (!(blockEntity instanceof PillowBlockEntity pillowBlockEntity)) return;
 
         world.playSound(null, pos, SoundEvents.BLOCK_WOOL_BREAK, SoundCategory.BLOCKS, 1.0F, 1.0F);
         pillowBlockEntity.squish();
-        world.emitGameEvent(player, GameEvent.BLOCK_CHANGE, pos);
 
         if (world instanceof ServerWorld serverWorld) {
             serverWorld.spawnParticles(
@@ -120,6 +122,19 @@ public class PillowBlock extends BlockWithEntity {
                     0.2, 0, 0.2, 0
             );
         }
+    }
+
+    @Override
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (hand == Hand.MAIN_HAND && player.isSneaking() && player.getStackInHand(hand).isEmpty()) {
+            world.setBlockState(pos, state.with(TRIMMED, !state.get(TRIMMED)));
+            world.emitGameEvent(player, GameEvent.BLOCK_CHANGE, pos);
+
+            return ActionResult.SUCCESS;
+        }
+
+        BlockEntity blockEntity = world.getBlockEntity(pos);
+        this.squish(world, blockEntity, pos);
 
         return ActionResult.SUCCESS;
     }
