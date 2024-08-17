@@ -9,7 +9,7 @@
     "repo": "https://github.com/GitWither/cushypillows"
   },
   "license": "All-Rights-Reserved",
-  "icon": "assets/cushypillows/CushyPillowsIcon.png",
+  "icon": "assets/cushypillows/icon.png",
   "environment": "*",
   "entrypoints": {
     "fabric-datagen": [
