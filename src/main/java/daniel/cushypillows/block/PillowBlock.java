@@ -3,6 +3,7 @@ package daniel.cushypillows.block;
 import daniel.cushypillows.block.entity.CushyPillowsBlockEntities;
 import daniel.cushypillows.block.entity.PillowBlockEntity;
 import daniel.cushypillows.particle.CushyPillowsParticleTypes;
+import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.DecoratedPotBlockEntity;
@@ -15,6 +16,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
@@ -135,6 +137,10 @@ public class PillowBlock extends BlockWithEntity {
 
         BlockEntity blockEntity = world.getBlockEntity(pos);
         this.squish(world, blockEntity, pos);
+
+        if (player instanceof ServerPlayerEntity serverPlayer) {
+            Criteria.ITEM_USED_ON_BLOCK.trigger(serverPlayer, pos, player.getStackInHand(hand));
+        }
 
         return ActionResult.SUCCESS;
     }
