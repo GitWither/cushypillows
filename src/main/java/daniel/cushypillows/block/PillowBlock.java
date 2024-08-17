@@ -47,6 +47,7 @@ public class PillowBlock extends BlockWithEntity {
 
     public static final IntProperty ROTATION = Properties.ROTATION;
     public static final BooleanProperty ATTACHED = Properties.ATTACHED;
+    public static final BooleanProperty TRIMMED = BooleanProperty.of("trimmed");
 
     private static final VoxelShape DEFAULT = Block.createCuboidShape(2.0, 0.0, 2.0, 14.0, 5.0, 14.0);
     private static final VoxelShape BED = DEFAULT.offset(0, -2, 0);
@@ -63,6 +64,7 @@ public class PillowBlock extends BlockWithEntity {
         );
 
         this.setDefaultState(this.stateManager.getDefaultState().with(ROTATION, 0));
+        this.setDefaultState(this.getStateManager().getDefaultState().with(TRIMMED, false));
         this.color = color;
         COLORED_PILLOWS.put(color, this);
     }
@@ -97,7 +99,7 @@ public class PillowBlock extends BlockWithEntity {
         }
 
         if (player.getStackInHand(hand) == ItemStack.EMPTY && hand == Hand.MAIN_HAND && player.isSneaking()) {
-            pillowBlockEntity.setTrimmed(!pillowBlockEntity.isTrimmed());
+            world.setBlockState(pos, state.with(TRIMMED, !world.getBlockState(pos).get(TRIMMED)));
         } else {
             world.playSound(null, pos, SoundEvents.BLOCK_WOOL_BREAK, SoundCategory.BLOCKS, 1.0F, 1.0F);
             pillowBlockEntity.squish();
@@ -128,7 +130,8 @@ public class PillowBlock extends BlockWithEntity {
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         return this.getDefaultState()
                 .with(ROTATION, RotationPropertyHelper.fromYaw(ctx.getPlayerYaw() + 180.0f))
-                .with(ATTACHED, ctx.getWorld().getBlockState(ctx.getBlockPos().down()).isIn(BlockTags.BEDS));
+                .with(ATTACHED, ctx.getWorld().getBlockState(ctx.getBlockPos().down()).isIn(BlockTags.BEDS))
+                .with(TRIMMED, false);
     }
 
     @Override
@@ -145,6 +148,7 @@ public class PillowBlock extends BlockWithEntity {
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(ROTATION);
         builder.add(ATTACHED);
+        builder.add(TRIMMED);
     }
 
     @Override

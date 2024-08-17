@@ -2,6 +2,7 @@ package daniel.cushypillows.block.entity;
 
 import com.mojang.datafixers.util.Pair;
 import daniel.cushypillows.block.PillowBlock;
+import net.fabricmc.fabric.impl.transfer.transaction.TransactionManagerImpl;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BannerBlockEntity;
@@ -24,7 +25,6 @@ public class PillowBlockEntity extends BlockEntity {
     private NbtList patternListNbt;
     private List<Pair<RegistryEntry<BannerPattern>, DyeColor>> patterns;
     private long lastSquishTime;
-    public boolean isTrimmed = false;
 
     public PillowBlockEntity(BlockPos pos, BlockState state) {
         super(CushyPillowsBlockEntities.PILLOW, pos, state);
@@ -60,14 +60,6 @@ public class PillowBlockEntity extends BlockEntity {
         } else {
             return super.onSyncedBlockEvent(type, data);
         }
-    }
-
-    public boolean isTrimmed() {
-        return this.isTrimmed;
-    }
-
-    public void setTrimmed(boolean isTrimmedNew) {
-        this.isTrimmed = isTrimmedNew;
     }
 
     @Override

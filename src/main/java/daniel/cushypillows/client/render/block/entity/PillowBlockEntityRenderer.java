@@ -61,14 +61,14 @@ public class PillowBlockEntityRenderer implements BlockEntityRenderer<PillowBloc
     public void render(PillowBlockEntity pillow, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         matrices.push();
 
-        this.trim.visible = !pillow.isTrimmed();
-
         BlockState cachedPillowState = pillow.getCachedState();
         float degrees = -RotationPropertyHelper.toDegrees(cachedPillowState.get(PillowBlock.ROTATION));
 
         matrices.translate(0.5, 0.0, 0.5);
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(degrees));
         matrices.translate(-0.5, 0.0, -0.5);
+
+        this.trim.visible = !cachedPillowState.get(PillowBlock.TRIMMED);
 
         if (cachedPillowState.get(PillowBlock.ATTACHED)) {
             matrices.translate(0, -0.45, 0);
