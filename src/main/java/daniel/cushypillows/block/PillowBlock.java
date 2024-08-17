@@ -52,7 +52,7 @@ public class PillowBlock extends BlockWithEntity {
     public static final BooleanProperty TRIMMED = BooleanProperty.of("trimmed");
 
     private static final VoxelShape DEFAULT = Block.createCuboidShape(2.0, 0.0, 2.0, 14.0, 5.0, 14.0);
-    private static final VoxelShape BED = DEFAULT.offset(0, -2, 0);
+    private static final VoxelShape BED = Block.createCuboidShape(2.0, -7.0, 2.0, 14.0, -2.0, 14.0);
 
     private final DyeColor color;
 
