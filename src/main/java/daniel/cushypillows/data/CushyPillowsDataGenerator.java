@@ -27,6 +27,7 @@ import net.minecraft.data.client.Model;
 import net.minecraft.data.server.advancement.vanilla.VanillaAdvancementProviders;
 import net.minecraft.data.server.advancement.vanilla.VanillaHusbandryTabAdvancementGenerator;
 import net.minecraft.data.server.recipe.RecipeJsonProvider;
+import net.minecraft.data.server.recipe.RecipeProvider;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.DyeItem;
@@ -45,6 +46,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.DamageTypeTags;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.command.AdvancementCommand;
 import net.minecraft.text.Text;
@@ -52,10 +54,13 @@ import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 
+import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
     @Override
@@ -267,20 +272,22 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
                 map.put(DyeColor.BLACK, Blocks.BLACK_WOOL);
             });
 
+            List<Item> dyes = Arrays.stream(DyeColor.values()).map(DyeItem::byColor).collect(Collectors.toUnmodifiableList());
+            List<Item> pillows = Arrays.stream(DyeColor.values()).map(dye -> PillowBlock.getForColor(dye).asItem()).toList();
+
+            RecipeProvider.offerDyeableRecipes(exporter, dyes, pillows, "pillows");
+
             for (DyeColor color : DyeColor.values()) {
                 Block pillow = PillowBlock.getForColor(color);
-                Item dye = DyeItem.byColor(color);
                 Block wool = dyeToWool.get(color);
 
-                ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, pillow)
+                ShapedRecipeJsonBuilder.create(RecipeCategory.BUILDING_BLOCKS, pillow)
                         .pattern("WFW")
-                        .pattern(" D ")
                         .input('F', Items.FEATHER)
-                        .input('D', dye)
                         .input('W', wool.asItem())
-                        .criterion(hasItem(Items.FEATHER), conditionsFromItem(Items.FEATHER))
-                        .criterion(hasItem(dye), conditionsFromItem(dye))
-                        .criterion(hasItem(wool), conditionsFromItem(Items.WHITE_WOOL))
+                        .group("pillows")
+                        .criterion(hasItem(wool), conditionsFromTag(ItemTags.WOOL))
+                        .showNotification(true)
                         .offerTo(exporter, new Identifier(getRecipeName(pillow)));
             }
         }
