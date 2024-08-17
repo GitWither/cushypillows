@@ -34,30 +34,34 @@ public class PillowBlockEntityRenderer implements BlockEntityRenderer<PillowBloc
 
     private final ModelPart root;
     private final ModelPart main;
+    private final ModelPart trim;
     private final ModelPart pattern;
 
     public PillowBlockEntityRenderer(BlockEntityRendererFactory.Context ctx) {
         this.root = ctx.getLayerModelPart(CushyPillowsEntityModelLayers.PILLOW);
         this.main = root.getChild("main");
+        this.trim = main.getChild("trim");
         this.pattern = root.getChild("pattern");
     }
 
     public static TexturedModelData getTexturedModelData() {
         ModelData modelData = new ModelData();
         ModelPartData modelPartData = modelData.getRoot();
-        ModelPartData main = modelPartData.addChild("main", ModelPartBuilder.create().uv(0, 14).cuboid(2.0F, -30.0F, 4.0F, 12.0F, 5.0F, 8.0F, new Dilation(0.3F))
-                .uv(0, 0).cuboid(-1.0F, -25.75F, 1.0F, 18.0F, 0.0F, 14.0F, new Dilation(0.0F)), ModelTransform.of(0.0F, -25.0F, 16.0F, 3.1416F, 0.0F, 0.0F));
 
+        ModelPartData main = modelPartData.addChild("main", ModelPartBuilder.create().uv(0, 14).cuboid(2.0F, -30.0F, 4.0F, 12.0F, 5.0F, 8.0F, new Dilation(0.3F)), ModelTransform.of(0.0F, -25.0F, 16.0F, 3.1416F, 0.0F, 0.0F));
+        ModelPartData trim = main.addChild("trim", ModelPartBuilder.create().uv(0, 0).cuboid(-21.0F, -2.5F, 1.0F, 18.0F, 0.0F, 14.0F, new Dilation(0.0F)), ModelTransform.pivot(20.0F, -23.25F, 0.0F));
         ModelPartData pattern = modelPartData.addChild("pattern", ModelPartBuilder.create().uv(1, 8).mirrored().cuboid(2.0F, 4.0F, 15.0F, 12.0F, 8.0F, 0.0F, new Dilation(0.301F)).mirrored(false)
                 .uv(-4, 3).mirrored().cuboid(2.0F, 4.0F, 15.0F, 12.0F, 0.0F, 5.0F, new Dilation(0.301F)).mirrored(false), ModelTransform.of(0.0F, 20.0F, 0.0F, 1.5708F, 0.0F, 0.0F));
-
         ModelPartData cube_r1 = pattern.addChild("cube_r1", ModelPartBuilder.create().uv(-4, 16).mirrored().cuboid(-6.0F, 0.0F, -2.5F, 12.0F, 0.0F, 5.0F, new Dilation(0.301F)).mirrored(false), ModelTransform.of(8.0F, 12.0F, 17.5F, 3.1416F, 0.0F, 0.0F));
+
         return TexturedModelData.of(modelData, 64, 64);
     }
 
     @Override
     public void render(PillowBlockEntity pillow, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         matrices.push();
+
+        this.trim.visible = !pillow.isTrimmed();
 
         BlockState cachedPillowState = pillow.getCachedState();
         float degrees = -RotationPropertyHelper.toDegrees(cachedPillowState.get(PillowBlock.ROTATION));

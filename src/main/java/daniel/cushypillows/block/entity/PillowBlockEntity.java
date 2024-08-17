@@ -2,19 +2,16 @@ package daniel.cushypillows.block.entity;
 
 import com.mojang.datafixers.util.Pair;
 import daniel.cushypillows.block.PillowBlock;
-import net.minecraft.block.AbstractBannerBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BannerBlockEntity;
 import net.minecraft.block.entity.BannerPattern;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.DecoratedPotBlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.BlockPos;
 
@@ -27,6 +24,7 @@ public class PillowBlockEntity extends BlockEntity {
     private NbtList patternListNbt;
     private List<Pair<RegistryEntry<BannerPattern>, DyeColor>> patterns;
     private long lastSquishTime;
+    public boolean isTrimmed = false;
 
     public PillowBlockEntity(BlockPos pos, BlockState state) {
         super(CushyPillowsBlockEntities.PILLOW, pos, state);
@@ -64,6 +62,13 @@ public class PillowBlockEntity extends BlockEntity {
         }
     }
 
+    public boolean isTrimmed() {
+        return this.isTrimmed;
+    }
+
+    public void setTrimmed(boolean isTrimmedNew) {
+        this.isTrimmed = isTrimmedNew;
+    }
 
     @Override
     protected void writeNbt(NbtCompound nbt) {

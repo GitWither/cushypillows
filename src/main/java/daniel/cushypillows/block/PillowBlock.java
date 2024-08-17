@@ -91,22 +91,27 @@ public class PillowBlock extends BlockWithEntity {
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (world instanceof ServerWorld serverWorld) {
-            serverWorld.spawnParticles(
-                    (ParticleEffect) CushyPillowsParticleTypes.FEATHERS,
-                    pos.getX() + 0.5f, pos.getY() + 0.2f, pos.getZ() + 0.5f,
-                    3,
-                    0.2, 0, 0.2, 0
-            );
+
+        if (!(blockEntity instanceof PillowBlockEntity pillowBlockEntity)) {
+            return ActionResult.PASS;
         }
 
-        if (!(blockEntity instanceof PillowBlockEntity pillowBlockEntity)) return ActionResult.PASS;
+        if (player.getStackInHand(hand) == ItemStack.EMPTY && hand == Hand.MAIN_HAND && player.isSneaking()) {
+            pillowBlockEntity.setTrimmed(!pillowBlockEntity.isTrimmed());
+        } else {
+            world.playSound(null, pos, SoundEvents.BLOCK_WOOL_BREAK, SoundCategory.BLOCKS, 1.0F, 1.0F);
+            pillowBlockEntity.squish();
+            world.emitGameEvent(player, GameEvent.BLOCK_CHANGE, pos);
 
-        world.playSound(null, pos, SoundEvents.BLOCK_WOOL_BREAK, SoundCategory.BLOCKS, 1.0F, 1.0F);
-
-        pillowBlockEntity.squish();
-
-        world.emitGameEvent(player, GameEvent.BLOCK_CHANGE, pos);
+            if (world instanceof ServerWorld serverWorld) {
+                serverWorld.spawnParticles(
+                        (ParticleEffect) CushyPillowsParticleTypes.FEATHERS,
+                        pos.getX() + 0.5f, pos.getY() + 0.2f, pos.getZ() + 0.5f,
+                        3,
+                        0.2, 0, 0.2, 0
+                );
+            }
+        }
 
         return ActionResult.SUCCESS;
     }
