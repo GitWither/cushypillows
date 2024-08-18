@@ -72,7 +72,8 @@ public class PillowBlockEntityRenderer implements BlockEntityRenderer<PillowBloc
         this.trim.visible = !cachedPillowState.get(PillowBlock.TRIMMED);
 
         if (cachedPillowState.get(PillowBlock.ATTACHED)) {
-            matrices.translate(0, -0.45, 0);
+            matrices.scale(0.85f, 0.45f, 0.85f);
+            matrices.translate(0.1, -1f, 0);
         }
 
         if (pillow.getWorld() != null) {
