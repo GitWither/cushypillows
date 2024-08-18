@@ -115,15 +115,7 @@ public class PillowBlock extends BlockWithEntity {
 
         world.playSound(null, pos, SoundEvents.BLOCK_WOOL_BREAK, SoundCategory.BLOCKS, 1.0F, 1.0F);
         pillowBlockEntity.squish();
-
-        if (world instanceof ServerWorld serverWorld) {
-            serverWorld.spawnParticles(
-                    (ParticleEffect) CushyPillowsParticleTypes.FEATHERS,
-                    pos.getX() + 0.5f, pos.getY() + 0.2f, pos.getZ() + 0.5f,
-                    3,
-                    0.2, 0, 0.2, 0
-            );
-        }
+        spawnFeatherParticles(world, pos, 3);
     }
 
     @Override
@@ -193,5 +185,16 @@ public class PillowBlock extends BlockWithEntity {
 
     public static Block getForColor(DyeColor color) {
         return COLORED_PILLOWS.getOrDefault(color, CushyPillowsBlocks.WHITE_PILLOW);
+    }
+
+    public static void spawnFeatherParticles(World world, BlockPos pos, int count) {
+        if (world instanceof ServerWorld serverWorld) {
+            serverWorld.spawnParticles(
+                    (ParticleEffect) CushyPillowsParticleTypes.FEATHERS,
+                    pos.getX() + 0.5f, pos.getY() + 0.2f, pos.getZ() + 0.5f,
+                    count,
+                    0.2, 0, 0.2, 0
+            );
+        }
     }
 }
