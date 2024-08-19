@@ -4,6 +4,8 @@ import com.google.common.collect.Maps;
 import daniel.cushypillows.CushyPillows;
 import daniel.cushypillows.block.CushyPillowsBlocks;
 import daniel.cushypillows.block.PillowBlock;
+import daniel.cushypillows.block.entity.CushyPillowsBlockEntities;
+import daniel.cushypillows.block.entity.PillowBlockEntity;
 import daniel.cushypillows.entity.CushyPillowsEntities;
 import daniel.cushypillows.item.CushyPillowsItems;
 import daniel.cushypillows.recipe.CushyPillowsRecipeTypes;
@@ -21,6 +23,9 @@ import net.minecraft.advancement.CriterionMerger;
 import net.minecraft.advancement.criterion.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BannerPattern;
+import net.minecraft.block.entity.BannerPatterns;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.data.client.BlockStateModelGenerator;
 import net.minecraft.data.client.ItemModelGenerator;
 import net.minecraft.data.client.Model;
@@ -30,9 +35,9 @@ import net.minecraft.data.server.recipe.RecipeJsonProvider;
 import net.minecraft.data.server.recipe.RecipeProvider;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.entity.EntityType;
-import net.minecraft.item.DyeItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
+import net.minecraft.item.*;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.predicate.BlockPredicate;
 import net.minecraft.predicate.DamagePredicate;
 import net.minecraft.predicate.TagPredicate;
@@ -51,8 +56,11 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.command.AdvancementCommand;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.village.raid.Raid;
 
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -95,14 +103,37 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
                             true,
                             false
                     )
-                    .criterion("get_pillows", InventoryChangedCriterion.Conditions.items(CushyPillowsItems.WHITE_PILLOW))
-                    .criteriaMerger(CriterionMerger.AND)
+                    .criterion("get_pillows", InventoryChangedCriterion.Conditions.items(ItemPredicate.Builder.create().items(
+                            CushyPillowsItems.WHITE_PILLOW,
+                            CushyPillowsItems.ORANGE_PILLOW,
+                            CushyPillowsItems.MAGENTA_PILLOW,
+                            CushyPillowsItems.LIGHT_BLUE_PILLOW,
+                            CushyPillowsItems.YELLOW_PILLOW,
+                            CushyPillowsItems.LIME_PILLOW,
+                            CushyPillowsItems.PINK_PILLOW,
+                            CushyPillowsItems.GRAY_PILLOW,
+                            CushyPillowsItems.LIGHT_GRAY_PILLOW,
+                            CushyPillowsItems.CYAN_PILLOW,
+                            CushyPillowsItems.PURPLE_PILLOW,
+                            CushyPillowsItems.BLUE_PILLOW,
+                            CushyPillowsItems.BROWN_PILLOW,
+                            CushyPillowsItems.GREEN_PILLOW,
+                            CushyPillowsItems.RED_PILLOW,
+                            CushyPillowsItems.BLACK_PILLOW
+                    ).build()))
+                    .criteriaMerger(CriterionMerger.OR)
                     .build(new Identifier(CushyPillows.MOD_ID, "husbandry/root"));
+
+            ItemStack creeperPillow = new ItemStack(CushyPillowsItems.LIME_PILLOW);
+            NbtCompound nbtCompound = new NbtCompound();
+            NbtList nbtList = new BannerPattern.Patterns().add(BannerPatterns.CREEPER, DyeColor.BLACK).toNbt();
+            nbtCompound.put("Patterns", nbtList);
+            BlockItem.setBlockEntityNbt(creeperPillow, CushyPillowsBlockEntities.PILLOW, nbtCompound);
 
             Advancement craftPillowPattern = Advancement.Builder.create()
                     .parent(root)
                     .display(
-                            CushyPillowsItems.LIME_PILLOW.asItem(), // TODO: Put pillow with creeper pattern here
+                            creeperPillow,
                             Text.translatable("advancements.husbandry.pillow.pattern.title"),
                             Text.translatable("advancements.husbandry.pillow.pattern.desc"),
                             null,
@@ -149,7 +180,7 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
                     .display(
                             CushyPillowsItems.RED_PILLOW,
                             Text.translatable("advancements.husbandry.pillow.pillow_fight.title"),
-                            Text.translatable("advancements.husbandry.pillow.pillow_fight.description"),
+                            Text.translatable("advancements.husbandry.pillow.pillow_fight.desc"),
                             null,
                             AdvancementFrame.TASK,
                             true,
@@ -286,9 +317,9 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
                         .input('F', Items.FEATHER)
                         .input('W', wool.asItem())
                         .group("pillows")
-                        .criterion(hasItem(wool), conditionsFromTag(ItemTags.WOOL))
+                        .criterion(hasItem(wool), conditionsFromItem(wool.asItem()))
                         .showNotification(true)
-                        .offerTo(exporter, new Identifier(getRecipeName(pillow)));
+                        .offerTo(exporter, new Identifier(CushyPillows.MOD_ID, getRecipeName(pillow)));
             }
         }
     }
