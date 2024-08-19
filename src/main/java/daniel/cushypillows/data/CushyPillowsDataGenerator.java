@@ -94,7 +94,7 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
             Advancement root = Advancement.Builder.create()
                     .parent(husbandryRoot)
                     .display(
-                            CushyPillowsItems.LIME_PILLOW.asItem(),
+                            CushyPillowsItems.LIGHT_BLUE_PILLOW.asItem(),
                             Text.translatable("advancements.husbandry.pillow.root.title"),
                             Text.translatable("advancements.husbandry.pillow.root.desc"),
                             null,
@@ -166,7 +166,24 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
                                                     .block(
                                                             BlockPredicate.Builder
                                                                     .create()
-                                                                    .blocks(CushyPillowsBlocks.WHITE_PILLOW)
+                                                                    .blocks(
+                                                                            CushyPillowsBlocks.WHITE_PILLOW,
+                                                                            CushyPillowsBlocks.ORANGE_PILLOW,
+                                                                            CushyPillowsBlocks.MAGENTA_PILLOW,
+                                                                            CushyPillowsBlocks.LIGHT_BLUE_PILLOW,
+                                                                            CushyPillowsBlocks.YELLOW_PILLOW,
+                                                                            CushyPillowsBlocks.LIME_PILLOW,
+                                                                            CushyPillowsBlocks.PINK_PILLOW,
+                                                                            CushyPillowsBlocks.GRAY_PILLOW,
+                                                                            CushyPillowsBlocks.LIGHT_GRAY_PILLOW,
+                                                                            CushyPillowsBlocks.CYAN_PILLOW,
+                                                                            CushyPillowsBlocks.PURPLE_PILLOW,
+                                                                            CushyPillowsBlocks.BLUE_PILLOW,
+                                                                            CushyPillowsBlocks.BROWN_PILLOW,
+                                                                            CushyPillowsBlocks.GREEN_PILLOW,
+                                                                            CushyPillowsBlocks.RED_PILLOW,
+                                                                            CushyPillowsBlocks.BLACK_PILLOW
+                                                                    )
                                                                     .build()
                                                     ),
                                             ItemPredicate.Builder.create()
