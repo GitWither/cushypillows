@@ -13,7 +13,7 @@ public class CushyPillowsEntities {
 	public static EntityType<PillowEntity> PILLOW_ENTITY = Registry.register(
 		Registries.ENTITY_TYPE,
 		new Identifier(CushyPillows.MOD_ID, "pillow"),
-		FabricEntityTypeBuilder.<PillowEntity>create(SpawnGroup.CREATURE, PillowEntity::new)
+		FabricEntityTypeBuilder.<PillowEntity>create(SpawnGroup.MISC, PillowEntity::new)
 			.dimensions(EntityDimensions.fixed(0.25f, 0.25f))
 			.trackRangeBlocks(25)
 			.trackedUpdateRate(20)

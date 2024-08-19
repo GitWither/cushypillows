@@ -10,12 +10,9 @@ import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class PillowEntity extends ThrownItemEntity {
@@ -34,14 +31,15 @@ public class PillowEntity extends ThrownItemEntity {
 
 	@Override
 	public void tick() {
-		World world = this.getWorld();
-		BlockPos pos = this.getBlockPos();
-
-		if (this.age % 6 == 0) {
-			PillowBlock.spawnFeatherParticles(world, pos, 1);
-		}
-
 		super.tick();
+
+		if (!this.getWorld().isClient() && this.age % 4 == 0) {
+			ServerWorld serverWorld = (ServerWorld) this.getWorld();
+			serverWorld.spawnParticles(
+					(ParticleEffect) CushyPillowsParticleTypes.FEATHERS,
+					getPos().getX(), getPos().getY(), getPos().getZ(),
+					1, 0.0, 0, 0, 0);
+		}
 	}
 
 	@Override
@@ -57,8 +55,6 @@ public class PillowEntity extends ThrownItemEntity {
 
 	@Override
 	protected void onCollision(HitResult hitResult) {
-		// getItem in L1 -> gets ItemStack of projectile
-		// getItem in L2 -> gets method of item of ItemStack
 		ItemStack projectileItem = this.getItem();
 
 		PillowBlock.spawnFeatherParticles(this.getWorld(), this.getBlockPos(), 3);

@@ -16,8 +16,10 @@ public class CushyPillowsClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         CushyPillowsEntityModelLayers.initialize();
+
         BlockEntityRendererFactories.register(CushyPillowsBlockEntities.PILLOW, PillowBlockEntityRenderer::new);
+        EntityRendererRegistry.register(CushyPillowsEntities.PILLOW_ENTITY, PillowEntityRenderer::new);
+
         ParticleFactoryRegistry.getInstance().register(CushyPillowsParticleTypes.FEATHERS, new FeatherParticle.Factory());
-        EntityRendererRegistry.register(CushyPillowsEntities.PILLOW_ENTITY, ctx -> new PillowEntityRenderer(ctx, 1, false));
     }
 }

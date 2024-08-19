@@ -65,7 +65,7 @@ import java.util.stream.Collectors;
 public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
     @Override
     public void onInitializeDataGenerator(FabricDataGenerator dataGenerator) {
-        final FabricDataGenerator.Pack pack = dataGenerator.createBuiltinResourcePack(new Identifier(CushyPillows.MOD_ID, "builtin"));
+        final FabricDataGenerator.Pack pack = dataGenerator.createPack();
 
         pack.addProvider(PillowTagProvider::new);
         pack.addProvider(PillowModelProvider::new);
