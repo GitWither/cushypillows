@@ -25,7 +25,7 @@ public class PillowEntityRenderer extends FlyingItemEntityRenderer<ThrownItemEnt
 
 		matrices.push();
 		matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotationDegrees));
-		matrices.scale(4, 4, 4);
+		matrices.scale(2, 2, 2);
 
 		itemRenderer.renderItem(entity.getStack(), ModelTransformationMode.GROUND, light, OverlayTexture.DEFAULT_UV, matrices, vertexConsumers, entity.getWorld(), 0);
 		matrices.pop();
