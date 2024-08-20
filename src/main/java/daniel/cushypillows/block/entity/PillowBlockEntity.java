@@ -99,14 +99,15 @@ public class PillowBlockEntity extends BlockEntity {
     }
 
     public ItemStack getPickStack() {
-        ItemStack itemStack = new ItemStack(BannerBlock.getForColor(this.baseColor));
+        ItemStack bannerStack = new ItemStack(BannerBlock.getForColor(this.baseColor));
+
         if (this.patternListNbt != null && !this.patternListNbt.isEmpty()) {
             NbtCompound nbtCompound = new NbtCompound();
-            nbtCompound.put("Patterns", this.patternListNbt.copy());
-            BlockItem.setBlockEntityNbt(itemStack, this.getType(), nbtCompound);
+            nbtCompound.put(PATTERNS_KEY, this.patternListNbt.copy());
+            BlockItem.setBlockEntityNbt(bannerStack, this.getType(), nbtCompound);
         }
 
-        return itemStack;
+        return bannerStack;
     }
 
     private static List<PatternEntry> getPatternsFromNbt(@Nullable NbtList patternListNbt) {
