@@ -57,14 +57,14 @@ public class PillowItem extends BlockItem {
 
         if (nbtCompound == null || !nbtCompound.contains(BannerBlockEntity.PATTERNS_KEY)) return;
 
-        NbtList nbtList = nbtCompound.getList("Patterns", 10);
+        NbtList nbtList = nbtCompound.getList(BannerBlockEntity.PATTERNS_KEY, 10);
 
         for(int i = 0; i < nbtList.size() && i < 6; ++i) {
             NbtCompound nbtCompound2 = nbtList.getCompound(i);
-            DyeColor dyeColor = DyeColor.byId(nbtCompound2.getInt("Color"));
-            RegistryEntry<BannerPattern> registryEntry = BannerPattern.byId(nbtCompound2.getString("Pattern"));
+            DyeColor dyeColor = DyeColor.byId(nbtCompound2.getInt(BannerBlockEntity.COLOR_KEY));
+            RegistryEntry<BannerPattern> registryEntry = BannerPattern.byId(nbtCompound2.getString(BannerBlockEntity.PATTERN_KEY));
 
-            if (registryEntry == null) return;
+            if (registryEntry == null) continue;
 
             registryEntry.getKey().map((key) ->
                     key.getValue().toShortTranslationKey()).ifPresent((translationKey) ->
