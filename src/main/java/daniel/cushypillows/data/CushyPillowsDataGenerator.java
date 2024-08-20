@@ -1,5 +1,6 @@
 package daniel.cushypillows.data;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import daniel.cushypillows.CushyPillows;
 import daniel.cushypillows.block.CushyPillowsBlocks;
@@ -12,10 +13,7 @@ import daniel.cushypillows.recipe.CushyPillowsRecipeTypes;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricAdvancementProvider;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
+import net.fabricmc.fabric.api.datagen.v1.provider.*;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementCriterion;
 import net.minecraft.advancement.AdvancementFrame;
@@ -36,6 +34,15 @@ import net.minecraft.data.server.recipe.RecipeProvider;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.*;
+import net.minecraft.loot.LootPool;
+import net.minecraft.loot.LootTable;
+import net.minecraft.loot.entry.ItemEntry;
+import net.minecraft.loot.entry.LeafEntry;
+import net.minecraft.loot.entry.LootPoolEntry;
+import net.minecraft.loot.function.CopyNameLootFunction;
+import net.minecraft.loot.function.CopyNbtLootFunction;
+import net.minecraft.loot.provider.nbt.ContextLootNbtProvider;
+import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.predicate.BlockPredicate;
@@ -79,6 +86,50 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
         pack.addProvider(PillowModelProvider::new);
         pack.addProvider(PillowRecipeProvider::new);
         pack.addProvider(PillowAdvancementProvider::new);
+        pack.addProvider(PillowLootTableProvider::new);
+    }
+
+    public static class PillowLootTableProvider extends FabricBlockLootTableProvider {
+
+        protected PillowLootTableProvider(FabricDataOutput dataOutput) {
+            super(dataOutput);
+        }
+
+        @Override
+        public void generate() {
+            List<Block> pillows = Lists.newArrayList(
+                    CushyPillowsBlocks.WHITE_PILLOW,
+                    CushyPillowsBlocks.ORANGE_PILLOW,
+                    CushyPillowsBlocks.MAGENTA_PILLOW,
+                    CushyPillowsBlocks.LIGHT_BLUE_PILLOW,
+                    CushyPillowsBlocks.YELLOW_PILLOW,
+                    CushyPillowsBlocks.LIME_PILLOW,
+                    CushyPillowsBlocks.PINK_PILLOW,
+                    CushyPillowsBlocks.GRAY_PILLOW,
+                    CushyPillowsBlocks.LIGHT_GRAY_PILLOW,
+                    CushyPillowsBlocks.CYAN_PILLOW,
+                    CushyPillowsBlocks.PURPLE_PILLOW,
+                    CushyPillowsBlocks.BLUE_PILLOW,
+                    CushyPillowsBlocks.BROWN_PILLOW,
+                    CushyPillowsBlocks.GREEN_PILLOW,
+                    CushyPillowsBlocks.RED_PILLOW,
+                    CushyPillowsBlocks.BLACK_PILLOW
+            );
+
+            for (Block pillow : pillows) {
+                addDrop(pillow, LootTable.builder()
+                        .pool(this.addSurvivesExplosionCondition(
+                                pillow,
+                                LootPool.builder()
+                                        .rolls(ConstantLootNumberProvider.create(1.0f))
+                                        .with(ItemEntry.builder(pillow)
+                                                .apply(CopyNbtLootFunction.builder(ContextLootNbtProvider.BLOCK_ENTITY)
+                                                        .withOperation("Patterns", "BlockEntityTag.Patterns"))
+                                        )
+                        ))
+                );
+            }
+        }
     }
 
     private static class PillowAdvancementProvider extends FabricAdvancementProvider {

@@ -6,6 +6,7 @@ import daniel.cushypillows.particle.CushyPillowsParticleTypes;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -60,8 +61,9 @@ public class PillowBlock extends BlockWithEntity {
         super(Settings.create()
                 .breakInstantly()
                 .hardness(1.0f)
-                .mapColor(MapColor.WHITE)
+                .mapColor(color.getMapColor())
                 .sounds(BlockSoundGroup.WOOL)
+                .pistonBehavior(PistonBehavior.DESTROY)
                 .burnable()
         );
 
