@@ -6,8 +6,8 @@
   "description": "Adds customizable, interactive pillows that you can sleep with, decorate, and throw at others!",
   "authors": ["Daniel", "SirJain"],
   "contact": {
-    "repo": "https://github.com/GitWither/cushypillows",
-    "sources": "https://github.com/GitWither/cushypillows/issues",
+    "sources": "https://github.com/GitWither/cushypillows",
+    "issues": "https://github.com/GitWither/cushypillows/issues",
     "discord": "https://discord.gg/wM4CKTbFVN"
   },
   "license": "All-Rights-Reserved",
