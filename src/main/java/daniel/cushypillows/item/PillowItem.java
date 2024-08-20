@@ -1,16 +1,29 @@
 package daniel.cushypillows.item;
 
 import daniel.cushypillows.entity.PillowEntity;
+import net.minecraft.block.AbstractBannerBlock;
 import net.minecraft.block.Block;
+import net.minecraft.block.entity.BannerBlockEntity;
+import net.minecraft.block.entity.BannerPattern;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
+import net.minecraft.text.Text;
+import net.minecraft.util.DyeColor;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class PillowItem extends BlockItem {
     public PillowItem(Block block) {
@@ -37,5 +50,29 @@ public class PillowItem extends BlockItem {
         user.incrementStat(Stats.USED.getOrCreateStat(this));
 
         return TypedActionResult.success(stackInHand);
+    }
+
+    public static void appendBannerTooltip(ItemStack stack, List<Text> tooltip) {
+        NbtCompound nbtCompound = BlockItem.getBlockEntityNbt(stack);
+
+        if (nbtCompound == null || !nbtCompound.contains(BannerBlockEntity.PATTERNS_KEY)) return;
+
+        NbtList nbtList = nbtCompound.getList("Patterns", 10);
+
+        for(int i = 0; i < nbtList.size() && i < 6; ++i) {
+            NbtCompound nbtCompound2 = nbtList.getCompound(i);
+            DyeColor dyeColor = DyeColor.byId(nbtCompound2.getInt("Color"));
+            RegistryEntry<BannerPattern> registryEntry = BannerPattern.byId(nbtCompound2.getString("Pattern"));
+
+            if (registryEntry == null) return;
+
+            registryEntry.getKey().map((key) ->
+                    key.getValue().toShortTranslationKey()).ifPresent((translationKey) ->
+                    tooltip.add(Text.translatable("block.minecraft.banner." + translationKey + "." + dyeColor.getName()).formatted(Formatting.GRAY)));
+        }
+    }
+
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        appendBannerTooltip(stack, tooltip);
     }
 }
