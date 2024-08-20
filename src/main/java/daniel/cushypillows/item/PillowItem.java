@@ -53,14 +53,14 @@ public class PillowItem extends BlockItem {
     }
 
     public static void appendBannerTooltip(ItemStack stack, List<Text> tooltip) {
-        NbtCompound nbtCompound = BlockItem.getBlockEntityNbt(stack);
+        NbtCompound blockEntityNbt = BlockItem.getBlockEntityNbt(stack);
 
-        if (nbtCompound == null || !nbtCompound.contains(BannerBlockEntity.PATTERNS_KEY)) return;
+        if (blockEntityNbt == null || !blockEntityNbt.contains(BannerBlockEntity.PATTERNS_KEY)) return;
 
-        NbtList nbtList = nbtCompound.getList(BannerBlockEntity.PATTERNS_KEY, 10);
+        NbtList patterns = blockEntityNbt.getList(BannerBlockEntity.PATTERNS_KEY, 10);
 
-        for(int i = 0; i < nbtList.size() && i < 6; ++i) {
-            NbtCompound nbtCompound2 = nbtList.getCompound(i);
+        for (int i = 0; i < patterns.size() && i < 6; ++i) {
+            NbtCompound nbtCompound2 = patterns.getCompound(i);
             DyeColor dyeColor = DyeColor.byId(nbtCompound2.getInt(BannerBlockEntity.COLOR_KEY));
             RegistryEntry<BannerPattern> registryEntry = BannerPattern.byId(nbtCompound2.getString(BannerBlockEntity.PATTERN_KEY));
 
