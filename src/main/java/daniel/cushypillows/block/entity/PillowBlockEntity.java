@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PillowBlockEntity extends BlockEntity {
-    private static final String PATTERNS_KEY = "Patterns";
-    private static final String PATTERN_KEY = "Pattern";
-    private static final String COLOR_KEY = "Color";
+    public static final String PATTERNS_KEY = "Patterns";
+    public static final String PATTERN_KEY = "Pattern";
+    public static final String COLOR_KEY = "Color";
 
     private DyeColor baseColor;
     private NbtList patternListNbt;
@@ -99,7 +99,7 @@ public class PillowBlockEntity extends BlockEntity {
     }
 
     public ItemStack getPickStack() {
-        ItemStack bannerStack = new ItemStack(BannerBlock.getForColor(this.baseColor));
+        ItemStack bannerStack = new ItemStack(PillowBlock.getForColor(this.baseColor));
 
         if (this.patternListNbt != null && !this.patternListNbt.isEmpty()) {
             NbtCompound nbtCompound = new NbtCompound();

@@ -5,17 +5,13 @@ import daniel.cushypillows.block.entity.PillowBlockEntity;
 import daniel.cushypillows.particle.CushyPillowsParticleTypes;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.*;
-import net.minecraft.block.entity.BannerBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.DecoratedPotBlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleType;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -45,6 +41,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.EnumMap;
 import java.util.Map;
 
+@SuppressWarnings("deprecation")
 public class PillowBlock extends BlockWithEntity {
     private static final float BOUNCE_MODIFIER = 0.66f;
 
@@ -138,9 +135,13 @@ public class PillowBlock extends BlockWithEntity {
         return ActionResult.SUCCESS;
     }
 
+    @Override
     public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        return blockEntity instanceof PillowBlockEntity ? ((PillowBlockEntity)blockEntity).getPickStack() : super.getPickStack(world, pos, state);
+
+        if (!(blockEntity instanceof PillowBlockEntity pillowBlockEntity)) return super.getPickStack(world, pos, state);
+
+        return pillowBlockEntity.getPickStack();
     }
 
     @Override
