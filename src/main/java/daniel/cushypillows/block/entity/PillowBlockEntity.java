@@ -3,6 +3,7 @@ package daniel.cushypillows.block.entity;
 import com.mojang.datafixers.util.Pair;
 import daniel.cushypillows.block.PillowBlock;
 import daniel.cushypillows.util.PatternEntry;
+import net.minecraft.block.BannerBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BannerBlockEntity;
@@ -95,6 +96,17 @@ public class PillowBlockEntity extends BlockEntity {
         if (this.world != null && !this.world.isClient()) {
             this.world.addSyncedBlockEvent(this.getPos(), this.getCachedState().getBlock(), Block.NOTIFY_NEIGHBORS, 0);
         }
+    }
+
+    public ItemStack getPickStack() {
+        ItemStack itemStack = new ItemStack(BannerBlock.getForColor(this.baseColor));
+        if (this.patternListNbt != null && !this.patternListNbt.isEmpty()) {
+            NbtCompound nbtCompound = new NbtCompound();
+            nbtCompound.put("Patterns", this.patternListNbt.copy());
+            BlockItem.setBlockEntityNbt(itemStack, this.getType(), nbtCompound);
+        }
+
+        return itemStack;
     }
 
     private static List<PatternEntry> getPatternsFromNbt(@Nullable NbtList patternListNbt) {

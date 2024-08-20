@@ -5,6 +5,7 @@ import daniel.cushypillows.block.entity.PillowBlockEntity;
 import daniel.cushypillows.particle.CushyPillowsParticleTypes;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.*;
+import net.minecraft.block.entity.BannerBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.DecoratedPotBlockEntity;
 import net.minecraft.entity.Entity;
@@ -135,6 +136,11 @@ public class PillowBlock extends BlockWithEntity {
         }
 
         return ActionResult.SUCCESS;
+    }
+
+    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+        BlockEntity blockEntity = world.getBlockEntity(pos);
+        return blockEntity instanceof PillowBlockEntity ? ((PillowBlockEntity)blockEntity).getPickStack() : super.getPickStack(world, pos, state);
     }
 
     @Override
