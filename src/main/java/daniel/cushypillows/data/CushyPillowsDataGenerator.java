@@ -31,6 +31,7 @@ import net.minecraft.item.*;
 import net.minecraft.loot.LootPool;
 import net.minecraft.loot.LootTable;
 import net.minecraft.loot.entry.ItemEntry;
+import net.minecraft.loot.function.CopyComponentsLootFunction;
 import net.minecraft.loot.function.CopyNbtLootFunction;
 import net.minecraft.loot.provider.nbt.ContextLootNbtProvider;
 import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
@@ -104,10 +105,12 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
                                 LootPool.builder()
                                         .rolls(ConstantLootNumberProvider.create(1.0f))
                                         .with(ItemEntry.builder(pillow)
-                                                .apply(CopyNbtLootFunction.builder(ContextLootNbtProvider.BLOCK_ENTITY)
-                                                        .withOperation("Patterns", "BlockEntityTag.Patterns"))
+                                                .apply(CopyComponentsLootFunction.builder(CopyComponentsLootFunction.Source.BLOCK_ENTITY)
+                                                        .include(DataComponentTypes.BANNER_PATTERNS)
+                                                )
                                         )
-                        ))
+                                )
+                        )
                 );
             }
         }
