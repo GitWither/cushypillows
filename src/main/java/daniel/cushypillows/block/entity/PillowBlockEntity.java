@@ -18,8 +18,6 @@ import net.minecraft.util.math.BlockPos;
 
 public class PillowBlockEntity extends BlockEntity {
     public static final String PATTERNS_KEY = "Patterns";
-    public static final String PATTERN_KEY = "Pattern";
-    public static final String COLOR_KEY = "Color";
 
     private DyeColor baseColor;
     private BannerPatternsComponent patterns = BannerPatternsComponent.DEFAULT;
@@ -101,7 +99,7 @@ public class PillowBlockEntity extends BlockEntity {
     }
 
     public ItemStack getPickStack() {
-        ItemStack pillowStack = new ItemStack(BannerBlock.getForColor(this.baseColor));
+        ItemStack pillowStack = new ItemStack(PillowBlock.getForColor(this.baseColor));
         pillowStack.applyComponentsFrom(this.createComponentMap());
 
         return pillowStack;
