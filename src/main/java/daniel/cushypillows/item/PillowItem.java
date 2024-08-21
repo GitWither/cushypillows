@@ -1,33 +1,25 @@
 package daniel.cushypillows.item;
 
-import daniel.cushypillows.block.entity.PillowBlockEntity;
 import daniel.cushypillows.entity.PillowEntity;
-import net.minecraft.block.AbstractBannerBlock;
 import net.minecraft.block.Block;
-import net.minecraft.block.entity.BannerBlockEntity;
-import net.minecraft.block.entity.BannerPattern;
-import net.minecraft.client.item.TooltipContext;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.BannerPatternsComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Optional;
 
 public class PillowItem extends BlockItem {
     public PillowItem(Block block) {
-        super(block, new Settings());
+        super(block, new Settings().component(DataComponentTypes.BANNER_PATTERNS, BannerPatternsComponent.DEFAULT));
     }
 
     @Override
@@ -53,37 +45,14 @@ public class PillowItem extends BlockItem {
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        NbtCompound pillowNbt = BlockItem.getBlockEntityNbt(stack);
+    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+        BannerPatternsComponent bannerPatternsComponent = stack.get(DataComponentTypes.BANNER_PATTERNS);
 
-        if (pillowNbt == null || !pillowNbt.contains(PillowBlockEntity.PATTERNS_KEY)) return;
-
-        NbtList patterns = pillowNbt.getList(PillowBlockEntity.PATTERNS_KEY, 10);
-        StringBuilder builder = new StringBuilder();
-
-        for (int i = 0; i < 6 && i < patterns.size(); i++) {
-            NbtCompound patternCompound = patterns.getCompound(i);
-
-            DyeColor dyeColor = DyeColor.byId(patternCompound.getInt(PillowBlockEntity.COLOR_KEY));
-            RegistryEntry<BannerPattern> registryEntry = BannerPattern.byId(patternCompound.getString(PillowBlockEntity.PATTERN_KEY));
-
-            if (registryEntry == null) continue;
-
-            Optional<RegistryKey<BannerPattern>> registryKeyOptional = registryEntry.getKey();
-            if (registryKeyOptional.isEmpty()) continue;
-
-            RegistryKey<BannerPattern> registrykey = registryKeyOptional.get();
-            String translationKey = registrykey.getValue().toShortTranslationKey();
-
-            builder.setLength(0);
-            builder.append("block.minecraft.banner.");
-            builder.append(translationKey);
-            builder.append(".");
-            builder.append(dyeColor.getName());
-
-            Text patternText = Text.translatable(builder.toString()).formatted(Formatting.GRAY);
-
-            tooltip.add(patternText);
+        if (bannerPatternsComponent != null) {
+            for(int i = 0; i < Math.min(bannerPatternsComponent.layers().size(), 6); ++i) {
+                BannerPatternsComponent.Layer layer = bannerPatternsComponent.layers().get(i);
+                tooltip.add(layer.getTooltipText().formatted(Formatting.GRAY));
+            }
         }
     }
 }

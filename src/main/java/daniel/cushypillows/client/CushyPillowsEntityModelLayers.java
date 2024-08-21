@@ -12,7 +12,7 @@ public final class CushyPillowsEntityModelLayers {
 
     private static EntityModelLayer registerModelLayer(String id, String name, EntityModelLayerRegistry.TexturedModelDataProvider provider) {
         EntityModelLayer layer = new EntityModelLayer(
-                new Identifier(CushyPillows.MOD_ID, id),
+                Identifier.of(CushyPillows.MOD_ID, id),
                 name
         );
 

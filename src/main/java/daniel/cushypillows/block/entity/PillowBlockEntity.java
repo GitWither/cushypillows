@@ -1,26 +1,20 @@
 package daniel.cushypillows.block.entity;
 
-import com.mojang.datafixers.util.Pair;
+import daniel.cushypillows.CushyPillows;
 import daniel.cushypillows.block.PillowBlock;
-import daniel.cushypillows.util.PatternEntry;
 import net.minecraft.block.BannerBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BannerBlockEntity;
-import net.minecraft.block.entity.BannerPattern;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.item.BlockItem;
+import net.minecraft.component.ComponentMap;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.BannerPatternsComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.BlockPos;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class PillowBlockEntity extends BlockEntity {
     public static final String PATTERNS_KEY = "Patterns";
@@ -28,8 +22,7 @@ public class PillowBlockEntity extends BlockEntity {
     public static final String COLOR_KEY = "Color";
 
     private DyeColor baseColor;
-    private NbtList patternListNbt;
-    private List<PatternEntry> patterns;
+    private BannerPatternsComponent patterns = BannerPatternsComponent.DEFAULT;
     private long lastSquishTime;
 
     public PillowBlockEntity(BlockPos pos, BlockState state) {
@@ -41,10 +34,7 @@ public class PillowBlockEntity extends BlockEntity {
         return lastSquishTime;
     }
 
-    public List<PatternEntry> getPatterns() {
-        if (this.patterns == null) {
-            this.patterns = getPatternsFromNbt(this.patternListNbt);
-        }
+    public BannerPatternsComponent getPatterns() {
         return this.patterns;
     }
 
@@ -54,12 +44,7 @@ public class PillowBlockEntity extends BlockEntity {
 
     public void readFrom(ItemStack stack, DyeColor baseColor) {
         this.baseColor = baseColor;
-        this.readFrom(stack);
-    }
-
-    public void readFrom(ItemStack stack) {
-        this.patternListNbt = BannerBlockEntity.getPatternListNbt(stack);
-        this.patterns = null;
+        this.readComponents(stack);
     }
 
     @Override
@@ -73,23 +58,40 @@ public class PillowBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
-        if (this.patternListNbt != null) {
-            nbt.put(PATTERNS_KEY, this.patternListNbt);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.writeNbt(nbt, registryLookup);
+        if (!this.patterns.equals(BannerPatternsComponent.DEFAULT)) {
+            nbt.put(PATTERNS_KEY, BannerPatternsComponent.CODEC.encodeStart(registryLookup.getOps(NbtOps.INSTANCE), this.patterns).getOrThrow());
         }
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
-        this.patternListNbt = nbt.getList(PATTERNS_KEY, NbtElement.COMPOUND_TYPE);
-        this.patterns = null;
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
+        if (nbt.contains(PATTERNS_KEY)) {
+            BannerPatternsComponent.CODEC.parse(
+                    registryLookup.getOps(NbtOps.INSTANCE),
+                    nbt.get(PATTERNS_KEY)
+            ).resultOrPartial(patterns -> CushyPillows.LOGGER.error("Failed to parse banner patterns: '{}'", patterns))
+                    .ifPresent(patterns -> this.patterns = patterns);
+        }
     }
 
     @Override
-    public NbtCompound toInitialChunkDataNbt() {
-        return this.createNbt();
+    public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registryLookup) {
+        return this.createNbt(registryLookup);
+    }
+
+    @Override
+    protected void readComponents(BlockEntity.ComponentsAccess components) {
+        super.readComponents(components);
+        this.patterns = components.getOrDefault(DataComponentTypes.BANNER_PATTERNS, BannerPatternsComponent.DEFAULT);
+    }
+
+    @Override
+    protected void addComponents(ComponentMap.Builder componentMapBuilder) {
+        super.addComponents(componentMapBuilder);
+        componentMapBuilder.add(DataComponentTypes.BANNER_PATTERNS, this.patterns);
     }
 
     public void squish() {
@@ -99,31 +101,14 @@ public class PillowBlockEntity extends BlockEntity {
     }
 
     public ItemStack getPickStack() {
-        ItemStack bannerStack = new ItemStack(PillowBlock.getForColor(this.baseColor));
+        ItemStack pillowStack = new ItemStack(BannerBlock.getForColor(this.baseColor));
+        pillowStack.applyComponentsFrom(this.createComponentMap());
 
-        if (this.patternListNbt != null && !this.patternListNbt.isEmpty()) {
-            NbtCompound nbtCompound = new NbtCompound();
-            nbtCompound.put(PATTERNS_KEY, this.patternListNbt.copy());
-            BlockItem.setBlockEntityNbt(bannerStack, this.getType(), nbtCompound);
-        }
-
-        return bannerStack;
+        return pillowStack;
     }
 
-    private static List<PatternEntry> getPatternsFromNbt(@Nullable NbtList patternListNbt) {
-        ArrayList<PatternEntry> result = new ArrayList<>();
-
-        if (patternListNbt == null) return result;
-
-        for (int i = 0; i < patternListNbt.size(); ++i) {
-            NbtCompound nbtCompound = patternListNbt.getCompound(i);
-            RegistryEntry<BannerPattern> bannerPatternEntry = BannerPattern.byId(nbtCompound.getString(PATTERN_KEY));
-            if (bannerPatternEntry == null) continue;
-
-            int colorId = nbtCompound.getInt(COLOR_KEY);
-            result.add(new PatternEntry(bannerPatternEntry, DyeColor.byId(colorId)));
-        }
-
-        return result;
+    @Override
+    public void removeFromCopiedStackNbt(NbtCompound nbt) {
+        nbt.remove(PATTERNS_KEY);
     }
 }

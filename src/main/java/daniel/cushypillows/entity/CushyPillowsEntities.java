@@ -12,11 +12,11 @@ import net.minecraft.util.Identifier;
 public class CushyPillowsEntities {
 	public static EntityType<PillowEntity> PILLOW_ENTITY = Registry.register(
 		Registries.ENTITY_TYPE,
-		new Identifier(CushyPillows.MOD_ID, "pillow"),
-		FabricEntityTypeBuilder.<PillowEntity>create(SpawnGroup.MISC, PillowEntity::new)
-			.dimensions(EntityDimensions.fixed(0.25f, 0.25f))
-			.trackRangeBlocks(25)
-			.trackedUpdateRate(20)
+		Identifier.of(CushyPillows.MOD_ID, "pillow"),
+		EntityType.Builder.<PillowEntity>create(PillowEntity::new, SpawnGroup.MISC)
+			.dimensions(0.25f, 0.25f)
+			.maxTrackingRange(25)
+			.trackingTickInterval(20)
 			.build()
 	);
 

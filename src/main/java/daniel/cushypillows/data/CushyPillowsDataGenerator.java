@@ -5,46 +5,35 @@ import com.google.common.collect.Maps;
 import daniel.cushypillows.CushyPillows;
 import daniel.cushypillows.block.CushyPillowsBlocks;
 import daniel.cushypillows.block.PillowBlock;
-import daniel.cushypillows.block.entity.CushyPillowsBlockEntities;
-import daniel.cushypillows.block.entity.PillowBlockEntity;
 import daniel.cushypillows.entity.CushyPillowsEntities;
 import daniel.cushypillows.item.CushyPillowsItems;
 import daniel.cushypillows.recipe.CushyPillowsRecipeTypes;
+import daniel.cushypillows.recipe.PillowDecorationRecipe;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.*;
-import net.minecraft.advancement.Advancement;
-import net.minecraft.advancement.AdvancementCriterion;
-import net.minecraft.advancement.AdvancementFrame;
-import net.minecraft.advancement.CriterionMerger;
+import net.minecraft.advancement.*;
 import net.minecraft.advancement.criterion.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BannerPattern;
 import net.minecraft.block.entity.BannerPatterns;
-import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.BannerPatternsComponent;
 import net.minecraft.data.client.BlockStateModelGenerator;
 import net.minecraft.data.client.ItemModelGenerator;
 import net.minecraft.data.client.Model;
-import net.minecraft.data.server.advancement.vanilla.VanillaAdvancementProviders;
-import net.minecraft.data.server.advancement.vanilla.VanillaHusbandryTabAdvancementGenerator;
-import net.minecraft.data.server.recipe.RecipeJsonProvider;
+import net.minecraft.data.server.recipe.ComplexRecipeJsonBuilder;
+import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.data.server.recipe.RecipeProvider;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
-import net.minecraft.entity.EntityType;
 import net.minecraft.item.*;
 import net.minecraft.loot.LootPool;
 import net.minecraft.loot.LootTable;
 import net.minecraft.loot.entry.ItemEntry;
-import net.minecraft.loot.entry.LeafEntry;
-import net.minecraft.loot.entry.LootPoolEntry;
-import net.minecraft.loot.function.CopyNameLootFunction;
 import net.minecraft.loot.function.CopyNbtLootFunction;
 import net.minecraft.loot.provider.nbt.ContextLootNbtProvider;
 import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.predicate.BlockPredicate;
 import net.minecraft.predicate.DamagePredicate;
 import net.minecraft.predicate.TagPredicate;
@@ -53,21 +42,12 @@ import net.minecraft.predicate.entity.EntityPredicate;
 import net.minecraft.predicate.entity.LocationPredicate;
 import net.minecraft.predicate.item.ItemPredicate;
 import net.minecraft.recipe.book.RecipeCategory;
-import net.minecraft.registry.BuiltinRegistries;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.DamageTypeTags;
-import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.registry.tag.TagKey;
-import net.minecraft.server.command.AdvancementCommand;
 import net.minecraft.text.Text;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.village.raid.Raid;
+import net.minecraft.util.*;
 
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -91,8 +71,9 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
 
     public static class PillowLootTableProvider extends FabricBlockLootTableProvider {
 
-        protected PillowLootTableProvider(FabricDataOutput dataOutput) {
-            super(dataOutput);
+
+        protected PillowLootTableProvider(FabricDataOutput dataOutput, CompletableFuture<RegistryWrapper.WrapperLookup> registryLookup) {
+            super(dataOutput, registryLookup);
         }
 
         @Override
@@ -134,15 +115,15 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
 
     private static class PillowAdvancementProvider extends FabricAdvancementProvider {
 
-        protected PillowAdvancementProvider(FabricDataOutput output) {
-            super(output);
+        protected PillowAdvancementProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registryLookup) {
+            super(output, registryLookup);
         }
 
         @Override
-        public void generateAdvancement(Consumer<Advancement> consumer) {
-            final Advancement husbandryRoot = Advancement.Builder.create().build(new Identifier("husbandry/root"));
+        public void generateAdvancement(RegistryWrapper.WrapperLookup lookup, Consumer<net.minecraft.advancement.AdvancementEntry> consumer) {
+            final AdvancementEntry husbandryRoot = Advancement.Builder.create().build(Identifier.of("husbandry/root"));
 
-            Advancement root = Advancement.Builder.create()
+            AdvancementEntry root = Advancement.Builder.create()
                     .parent(husbandryRoot)
                     .display(
                             CushyPillowsItems.LIGHT_BLUE_PILLOW.asItem(),
@@ -172,16 +153,16 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
                             CushyPillowsItems.RED_PILLOW,
                             CushyPillowsItems.BLACK_PILLOW
                     ).build()))
-                    .criteriaMerger(CriterionMerger.OR)
-                    .build(new Identifier(CushyPillows.MOD_ID, "husbandry/root"));
+                    .criteriaMerger(AdvancementRequirements.CriterionMerger.OR)
+                    .build(Identifier.of(CushyPillows.MOD_ID, "husbandry/root"));
 
             ItemStack creeperPillow = new ItemStack(CushyPillowsItems.LIME_PILLOW);
-            NbtCompound nbtCompound = new NbtCompound();
-            NbtList nbtList = new BannerPattern.Patterns().add(BannerPatterns.CREEPER, DyeColor.BLACK).toNbt();
-            nbtCompound.put("Patterns", nbtList);
-            BlockItem.setBlockEntityNbt(creeperPillow, CushyPillowsBlockEntities.PILLOW, nbtCompound);
 
-            Advancement craftPillowPattern = Advancement.Builder.create()
+            BannerPatternsComponent bannerPatternsComponent = new BannerPatternsComponent.Builder()
+                    .add(lookup.getWrapperOrThrow(RegistryKeys.BANNER_PATTERN), BannerPatterns.CREEPER, DyeColor.BLACK).build();
+            creeperPillow.set(DataComponentTypes.BANNER_PATTERNS, bannerPatternsComponent);
+
+            AdvancementEntry craftPillowPattern = Advancement.Builder.create()
                     .parent(root)
                     .display(
                             creeperPillow,
@@ -193,11 +174,11 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
                             true,
                             false
                     )
-                    .criterion("craft_pattern_pillow", RecipeCraftedCriterion.Conditions.create(new Identifier(CushyPillowsRecipeTypes.PILLOW_DECORATION.toString())))
-                    .criteriaMerger(CriterionMerger.AND)
-                    .build(new Identifier(CushyPillows.MOD_ID, "husbandry/pattern"));
+                    .criterion("craft_pattern_pillow", RecipeCraftedCriterion.Conditions.create(Identifier.of(CushyPillowsRecipeTypes.PILLOW_DECORATION.toString())))
+                    .criteriaMerger(AdvancementRequirements.CriterionMerger.AND)
+                    .build(Identifier.of(CushyPillows.MOD_ID, "husbandry/pattern"));
 
-            Advancement featherBurst = Advancement.Builder.create()
+            AdvancementEntry featherBurst = Advancement.Builder.create()
                     .parent(root)
                     .display(
                             Items.FEATHER.asItem(),
@@ -235,15 +216,14 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
                                                                             CushyPillowsBlocks.RED_PILLOW,
                                                                             CushyPillowsBlocks.BLACK_PILLOW
                                                                     )
-                                                                    .build()
                                                     ),
                                             ItemPredicate.Builder.create()
                                     )
                     )
-                    .criteriaMerger(CriterionMerger.AND)
-                    .build(new Identifier(CushyPillows.MOD_ID, "husbandry/feather_burst"));
+                    .criteriaMerger(AdvancementRequirements.CriterionMerger.AND)
+                    .build(Identifier.of(CushyPillows.MOD_ID, "husbandry/feather_burst"));
 
-            Advancement pillowFight = Advancement.Builder.create()
+            AdvancementEntry pillowFight = Advancement.Builder.create()
                     .parent(featherBurst)
                     .display(
                             CushyPillowsItems.RED_PILLOW,
@@ -268,7 +248,7 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
                                                             )
                                             )
                             )
-                    ).build(new Identifier(CushyPillows.MOD_ID, "husbandry/pillow_fight"));
+                    ).build(Identifier.of(CushyPillows.MOD_ID, "husbandry/pillow_fight"));
 
             consumer.accept(root);
             consumer.accept(craftPillowPattern);
@@ -285,7 +265,7 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
 
         @Override
         protected void configure(RegistryWrapper.WrapperLookup arg) {
-            FabricTagBuilder builder = getOrCreateTagBuilder(TagKey.of(RegistryKeys.BLOCK, new Identifier(CushyPillows.MOD_ID, "pillows")));
+            FabricTagBuilder builder = getOrCreateTagBuilder(TagKey.of(RegistryKeys.BLOCK, Identifier.of(CushyPillows.MOD_ID, "pillows")));
 
             builder.add(
                     CushyPillowsBlocks.WHITE_PILLOW,
@@ -315,9 +295,9 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
 
         @Override
         public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
-            Model templatePillow = new Model(Optional.of(new Identifier(CushyPillows.MOD_ID, "item/template_pillow")), Optional.empty());
+            Model templatePillow = new Model(Optional.of(Identifier.of(CushyPillows.MOD_ID, "item/template_pillow")), Optional.empty());
             blockStateModelGenerator.registerBuiltin(
-                    new Identifier(CushyPillows.MOD_ID, "block/pillow"),
+                    Identifier.of(CushyPillows.MOD_ID, "block/pillow"),
                     Blocks.OAK_PLANKS
             ).includeWithItem(templatePillow,
                     CushyPillowsBlocks.WHITE_PILLOW,
@@ -341,17 +321,18 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
 
         @Override
         public void generateItemModels(ItemModelGenerator itemModelGenerator) {
-            Model parent = new Model(Optional.of(new Identifier(CushyPillows.MOD_ID, "item/template_pillow")), Optional.empty());
+            Model parent = new Model(Optional.of(Identifier.of(CushyPillows.MOD_ID, "item/template_pillow")), Optional.empty());
         }
     }
 
     public static class PillowRecipeProvider extends FabricRecipeProvider {
-        public PillowRecipeProvider(FabricDataOutput output) {
-            super(output);
+
+        public PillowRecipeProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
+            super(output, registriesFuture);
         }
 
         @Override
-        public void generate(Consumer<RecipeJsonProvider> exporter) {
+        public void generate(RecipeExporter exporter) {
             EnumMap<DyeColor, Block> dyeToWool = Util.make(Maps.newEnumMap(DyeColor.class), (map) -> {
                 map.put(DyeColor.WHITE, Blocks.WHITE_WOOL);
                 map.put(DyeColor.ORANGE, Blocks.ORANGE_WOOL);
@@ -387,8 +368,10 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
                         .group("pillows")
                         .criterion(hasItem(wool), conditionsFromItem(wool.asItem()))
                         .showNotification(true)
-                        .offerTo(exporter, new Identifier(CushyPillows.MOD_ID, getRecipeName(pillow)));
+                        .offerTo(exporter, Identifier.of(CushyPillows.MOD_ID, getRecipeName(pillow)));
             }
+
+            ComplexRecipeJsonBuilder.create(PillowDecorationRecipe::new).offerTo(exporter, Identifier.of(CushyPillows.MOD_ID, "pillow_decoration"));
         }
     }
 }

@@ -34,7 +34,7 @@ public final class CushyPillowsBlockEntities {
     private static <T extends BlockEntity> BlockEntityType<T> registerBlockEntity(String id, BlockEntityType.BlockEntityFactory<T> blockEntitySupplier, Block... blocks) {
         return Registry.register(
                 Registries.BLOCK_ENTITY_TYPE,
-                new Identifier(CushyPillows.MOD_ID, id),
+                Identifier.of(CushyPillows.MOD_ID, id),
                 BlockEntityType.Builder.create(blockEntitySupplier, blocks).build(null)
         );
     }

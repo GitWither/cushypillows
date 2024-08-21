@@ -1,5 +1,8 @@
 package daniel.cushypillows.block;
 
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import daniel.cushypillows.block.entity.CushyPillowsBlockEntities;
 import daniel.cushypillows.block.entity.PillowBlockEntity;
 import daniel.cushypillows.particle.CushyPillowsParticleTypes;
@@ -44,6 +47,12 @@ import java.util.Map;
 
 @SuppressWarnings("deprecation")
 public class PillowBlock extends BlockWithEntity {
+    public static final MapCodec<PillowBlock> CODEC = RecordCodecBuilder
+            .mapCodec(instance -> instance.group(
+                    DyeColor.CODEC.fieldOf("color").forGetter(PillowBlock::getColor),
+                    PillowBlock.createSettingsCodec()
+            ).apply(instance, (dyeColor, blockSettings) -> new PillowBlock(dyeColor)));
+
     private static final float BOUNCE_MODIFIER = 0.66f;
 
     private static final Map<DyeColor, Block> COLORED_PILLOWS = new EnumMap<>(DyeColor.class);
@@ -119,7 +128,9 @@ public class PillowBlock extends BlockWithEntity {
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        Hand hand = player.getActiveHand();
+
         if (hand == Hand.MAIN_HAND && player.isSneaking() && player.getStackInHand(hand).isEmpty()) {
             world.setBlockState(pos, state.with(TRIMMED, !state.get(TRIMMED)));
             world.emitGameEvent(player, GameEvent.BLOCK_CHANGE, pos);
@@ -138,7 +149,7 @@ public class PillowBlock extends BlockWithEntity {
     }
 
     @Override
-    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
         BlockEntity blockEntity = world.getBlockEntity(pos);
 
         if (!(blockEntity instanceof PillowBlockEntity pillowBlockEntity)) return super.getPickStack(world, pos, state);
@@ -179,17 +190,15 @@ public class PillowBlock extends BlockWithEntity {
         builder.add(TRIMMED);
     }
 
-    @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        if (world.isClient) {
-            world.getBlockEntity(pos, CushyPillowsBlockEntities.PILLOW).ifPresent(pillow -> pillow.readFrom(itemStack));
-        }
-    }
-
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new PillowBlockEntity(pos, state);
+    }
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return CODEC;
     }
 
     public static Block getForColor(DyeColor color) {

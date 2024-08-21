@@ -9,7 +9,7 @@ import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.particle.DefaultParticleType;
+import net.minecraft.particle.SimpleParticleType;
 
 public class FeatherParticle extends SpriteBillboardParticle {
     private static final ItemStack FEATHER_STACK = Items.FEATHER.getDefaultStack();
@@ -63,10 +63,10 @@ public class FeatherParticle extends SpriteBillboardParticle {
     }
 
     @Environment(value= EnvType.CLIENT)
-    public static class Factory implements ParticleFactory<DefaultParticleType> {
+    public static class Factory implements ParticleFactory<SimpleParticleType> {
 
         @Override
-        public Particle createParticle(DefaultParticleType defaultParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
+        public Particle createParticle(SimpleParticleType defaultParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
             return new FeatherParticle(clientWorld, d, e, f);
         }
     }

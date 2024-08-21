@@ -1,11 +1,9 @@
 package daniel.cushypillows.client.render.block.entity;
 
-import com.mojang.datafixers.util.Pair;
 import daniel.cushypillows.CushyPillows;
 import daniel.cushypillows.block.PillowBlock;
 import daniel.cushypillows.block.entity.PillowBlockEntity;
 import daniel.cushypillows.client.CushyPillowsEntityModelLayers;
-import daniel.cushypillows.util.PatternEntry;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BannerPattern;
 import net.minecraft.client.model.*;
@@ -18,8 +16,8 @@ import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.component.type.BannerPatternsComponent;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
@@ -30,7 +28,7 @@ import java.util.List;
 public class PillowBlockEntityRenderer implements BlockEntityRenderer<PillowBlockEntity> {
     public static final SpriteIdentifier PILLOW_BODY = new SpriteIdentifier(
             SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE,
-            new Identifier(CushyPillows.MOD_ID,"entity/pillow/pillow")
+            Identifier.of(CushyPillows.MOD_ID,"entity/pillow/pillow")
     );
 
     private final ModelPart root;
@@ -83,31 +81,30 @@ public class PillowBlockEntityRenderer implements BlockEntityRenderer<PillowBloc
             }
         }
 
-        List<PatternEntry> patterns = pillow.getPatterns();
+        BannerPatternsComponent patterns = pillow.getPatterns();
 
         VertexConsumer mainBodyConsumer = PILLOW_BODY.getVertexConsumer(vertexConsumers, RenderLayer::getEntityCutout);
 
-        float[] baseColor = pillow.getBaseColor().getColorComponents();
-        this.main.render(matrices, mainBodyConsumer, light, overlay, baseColor[0], baseColor[1], baseColor[2], 1.0f);
+        this.main.render(matrices, mainBodyConsumer, light, overlay, pillow.getBaseColor().getEntityColor());
 
         renderPatterns(matrices, vertexConsumers, light, overlay, this.pattern, patterns);
 
         matrices.pop();
     }
 
-    private static void renderPatterns(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, ModelPart canvas, List<PatternEntry> patterns) {
-        for (int i = 0; i < 17 && i < patterns.size(); i++) {
-            PatternEntry entry = patterns.get(i);
+    private static void renderPatterns(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, ModelPart canvas, BannerPatternsComponent patterns) {
+        List<BannerPatternsComponent.Layer> layers = patterns.layers();
 
-            float[] color = entry.color().getColorComponents();
+        for (int i = 0; i < 17 && i < layers.size(); i++) {
+            BannerPatternsComponent.Layer entry = layers.get(i);
 
             RegistryEntry<BannerPattern> bannerPatternEntry = entry.pattern();
             if (bannerPatternEntry.getKey().isEmpty()) continue;
 
-            SpriteIdentifier patternSprite = TexturedRenderLayers.getShieldPatternTextureId(bannerPatternEntry.getKey().get());
+            SpriteIdentifier patternSprite = TexturedRenderLayers.getShieldPatternTextureId(bannerPatternEntry);
             VertexConsumer consumer = patternSprite.getVertexConsumer(vertexConsumers, RenderLayer::getEntityNoOutline);
 
-            canvas.render(matrices, consumer, light, overlay, color[0], color[1], color[2], 1.0f);
+            canvas.render(matrices, consumer, light, overlay, entry.color().getEntityColor());
         }
     }
 }
