@@ -71,8 +71,6 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
     }
 
     public static class PillowLootTableProvider extends FabricBlockLootTableProvider {
-
-
         protected PillowLootTableProvider(FabricDataOutput dataOutput, CompletableFuture<RegistryWrapper.WrapperLookup> registryLookup) {
             super(dataOutput, registryLookup);
         }
@@ -117,7 +115,6 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
     }
 
     private static class PillowAdvancementProvider extends FabricAdvancementProvider {
-
         protected PillowAdvancementProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registryLookup) {
             super(output, registryLookup);
         }
@@ -261,7 +258,6 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
     }
 
     private static class PillowTagProvider extends FabricTagProvider.BlockTagProvider {
-
         public PillowTagProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
             super(output, registriesFuture);
         }
@@ -329,7 +325,6 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
     }
 
     public static class PillowRecipeProvider extends FabricRecipeProvider {
-
         public PillowRecipeProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
             super(output, registriesFuture);
         }
