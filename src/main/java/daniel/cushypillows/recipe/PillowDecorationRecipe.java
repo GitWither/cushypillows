@@ -30,9 +30,7 @@ public class PillowDecorationRecipe extends SpecialCraftingRecipe {
             if (currentItem.isEmpty()) continue;
 
             if (currentItem.getItem() instanceof BannerItem) {
-                if (!bannerStack.isEmpty()) {
-                    return false;
-                }
+                if (!bannerStack.isEmpty()) return false;
 
                 bannerStack = currentItem;
 
@@ -40,11 +38,9 @@ public class PillowDecorationRecipe extends SpecialCraftingRecipe {
             }
 
             if (currentItem.getItem() instanceof PillowItem) {
-                if (!pillowStack.isEmpty()) {
-                    return false;
-                }
+                if (!pillowStack.isEmpty()) return false;
 
-                BannerPatternsComponent bannerPatternsComponent = bannerStack.getOrDefault(DataComponentTypes.BANNER_PATTERNS, BannerPatternsComponent.DEFAULT);
+                BannerPatternsComponent bannerPatternsComponent = pillowStack.getOrDefault(DataComponentTypes.BANNER_PATTERNS, BannerPatternsComponent.DEFAULT);
                 if (!bannerPatternsComponent.layers().isEmpty()) {
                     return false;
                 }
