@@ -58,7 +58,7 @@ public class PillowEntity extends ThrownItemEntity {
 		ItemStack projectileItem = this.getItem();
 
 		PillowBlock.spawnFeatherParticles(this.getWorld(), this.getBlockPos(), 3);
-		this.dropItem(projectileItem.getItem());
+		this.dropStack(projectileItem);
 		this.discard();
 
 		super.onCollision(hitResult);
