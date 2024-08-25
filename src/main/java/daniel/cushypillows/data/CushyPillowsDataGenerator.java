@@ -318,7 +318,7 @@ public class CushyPillowsDataGenerator implements DataGeneratorEntrypoint {
             Model templatePillow = new Model(Optional.of(new Identifier(CushyPillows.MOD_ID, "item/template_pillow")), Optional.empty());
             blockStateModelGenerator.registerBuiltin(
                     new Identifier(CushyPillows.MOD_ID, "block/pillow"),
-                    CushyPillowsBlocks.WHITE_PILLOW
+                    Blocks.WHITE_WOOL
             ).includeWithItem(templatePillow,
                     CushyPillowsBlocks.WHITE_PILLOW,
                     CushyPillowsBlocks.ORANGE_PILLOW,
