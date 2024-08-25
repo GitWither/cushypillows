@@ -1,10 +1,8 @@
 package daniel.cushypillows.recipe;
 
-import daniel.cushypillows.block.CushyPillowsBlocks;
 import daniel.cushypillows.block.PillowBlock;
 import daniel.cushypillows.block.entity.CushyPillowsBlockEntities;
 import daniel.cushypillows.item.PillowItem;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.BannerItem;
 import net.minecraft.item.BlockItem;
@@ -96,6 +94,6 @@ public class PillowDecorationRecipe extends SpecialCraftingRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return CushyPillowsRecipeTypes.getSerializer(this.getType());
+        return CushyPillowsRecipeTypes.PILLOW_DECORATION_SERIALIZER;
     }
 }
